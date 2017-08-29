@@ -1,8 +1,8 @@
 alright guys populate tf out of it :fire:
 
-#H2 Project Structure
+## Project Structure
 
 run.py
 surveyapp
-    /static
-    /templates
+    static/
+    templates/
