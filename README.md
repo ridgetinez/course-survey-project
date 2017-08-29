@@ -4,5 +4,5 @@ alright guys populate tf out of it :fire:
 
  - run.py  
  - surveyapp  
-    - static/  
-    - templates/  
+    - /static  
+    - /templates  
