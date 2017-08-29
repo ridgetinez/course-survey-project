@@ -4,5 +4,8 @@ alright guys populate tf out of it :fire:
 
  - run.py  
  - surveyapp/ 
+    - __init__.py
+    - models.py
+    - views.py
     - static/
-    - templates/  
+    - templates/
