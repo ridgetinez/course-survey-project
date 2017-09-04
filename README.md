@@ -1,4 +1,4 @@
-## Contributing
+# Contributing
 
 We're going to adopt best practices for git. This pretty much means we'll be working on branches and merging them when we're done with our feature. For more information (and how to be a beast with git), read chapters 3 & 4 of [this git tutorial](https://www.learnenough.com/git-tutorial#sec-branching_and_merging).
 
