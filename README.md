@@ -1,8 +1,19 @@
-alright guys populate tf out of it :fire:
-
 ## Contributing
 
-Would 10/10 strongly suggest making a branch for all changes in case someone pushes a commit that breaks your stuff :heart:
+We're going to adopt best practices for git. This pretty much means we'll be working on branches and merging them when we're done with our feature. For more information (and how to be a beast with git), read chapters 3 & 4 of [this git tutorial](https://www.learnenough.com/git-tutorial#sec-branching_and_merging).
+
+We're going to the main MASTER branch, and then when you're working on - say, the SurveyController module and views - you'll branch out, and then merge back in when you've completed it.
+
+WORKFLOW
+========
+
+1. Dev checks out to their own feature branch.
+2. Commits changes to their feature branch.
+3. Pushes to the remote branch.
+4. Submits a pull request to merge back into master.
+5. Team reviews and either suggests fixes or merges to master branch.
+6. Dev is happy.
+
 
 ## Project Structure
 
