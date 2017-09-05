@@ -1,6 +1,6 @@
 from flask import Flask
 app = Flask(__name__)
 
-session["admin_flag"] = false
+app.secret_key = 'Minjie'
 
 import surveyapp.views

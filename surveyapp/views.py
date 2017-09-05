@@ -1,8 +1,10 @@
 from surveyapp import app
-from flask import render_template
+from flask import render_template, session
 
 @app.route('/')
 def index():
+    if "admin_flag" not in session:
+        session["admin_flag"] = False
     return render_template('landing_page.html');
 
 #need to add auth
