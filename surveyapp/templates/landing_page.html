@@ -24,6 +24,9 @@
                             <button type="submit" class="btn btn-dark">Login</button>
                         </div>
                     </form>
+                    {% if failedAuth %}
+                    <p class="text-danger">Invalid email and/or password</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
