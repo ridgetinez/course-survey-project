@@ -10,7 +10,12 @@
         <div class="col-sm-6">
             <div class="card">
                 <div class="card-header bg-dark text-white">Admin Login</div>
-                <div class="card-body">
+                <div class="card-body">                    
+                    <!-- Notify user if invalid login details entered-->
+                    {% if failedAuth %}
+                    <div class="alert alert-danger">Invalid email and/or password</div>
+                    {% endif %}
+                    <!-- Login form -->
                     <form method="POST">
                         <div class="form-group">
                             <label for="email">Email:</label>
@@ -24,9 +29,6 @@
                             <button type="submit" class="btn btn-dark">Login</button>
                         </div>
                     </form>
-                    {% if failedAuth %}
-                    <p class="text-danger">Invalid email and/or password</p>
-                    {% endif %}
                 </div>
             </div>
         </div>
