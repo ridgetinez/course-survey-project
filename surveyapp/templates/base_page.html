@@ -13,7 +13,10 @@
 
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-between">
-    <a class="navbar-brand" href="/">SurveySite</a>
+        <a class="navbar-brand" href="/">SurveySite</a>
+        <!-- used to add extra functionality to nav for admin -->
+        {% block nav %}
+        {% endblock %}
     </nav>
 
     <!-- Main Content Block -->
