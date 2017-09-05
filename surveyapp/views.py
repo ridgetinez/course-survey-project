@@ -1,18 +1,20 @@
-from surveyapp import app
+from surveyapp import app, authenticator
 from flask import render_template, session, redirect, url_for, request
-from surveyapp import authenticator
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
+        
+        #attempt to authenticate user using information from login form
         auth_success = authenticator.authenticate(request.form['email'], request.form['password'])
-        if auth_success == True:
+
+        if auth_success == True:    #if authenticated redirect to admin dashboard (user will have cookie marking as auth'd)
             return redirect(url_for('admin_dashboard', sub_page='surveys'))
-        else:
+        else:                       #render landing page again with notification of invalid login credentials
             return render_template('landing_page.html', failedAuth=True)
+
     return render_template('landing_page.html');
 
-#need to add auth
 @app.route('/dashboard/<sub_page>')
 def admin_dashboard(sub_page):
     #non-authenticated user attempts access

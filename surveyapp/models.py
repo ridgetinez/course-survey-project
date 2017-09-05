@@ -2,8 +2,8 @@ class Admin(object):
     """ Question object to populate question pools and surveys
     
     Args:
-    question_text -- String of the question displayed to user
-    answer_list   -- Tuple of strings representing multiple choice answers
+    email -- Admin's email
+    password   -- Admin's password
     """
         
     uaID = 0
@@ -23,12 +23,15 @@ class Admin(object):
     def __str__(self):
         return '{0} : {1}'.format(self.__aID, self.__email)
 
+    #getter function for admin id
     def getAdminID(self):
         return self.__aID
 
+    #getter function for admin email
     def getEmail(self):
         return self.__email
 
+    #checks if password matches admin's password
     def checkPassword(self, password):
         if password == self.__password:
             return True

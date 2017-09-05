@@ -4,10 +4,13 @@ from surveyapp.auth import UserAuthenticator
 
 app = Flask(__name__)
 
+#contains all of the admin login credentials
 admin_list = [Admin("admin@admin.com", "password")]
 
+#authenticator object used to authenticate users
 authenticator = UserAuthenticator(admin_list)
 
+#used for session encryption
 app.secret_key = 'Minjie'
 
 import surveyapp.views
