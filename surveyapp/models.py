@@ -42,16 +42,14 @@ class QuestionStore(object):
     question_list -- list of questions to be stored in container
     """
     def __init__(self, question_list):
-        # q_dict = {}
-        # for q in set(question_list):
-        #     q_dict[q.qid] = q
-        self.__question_dict = OrderedDict.fromkeys(question_list)
-        for qid in self.__question_dict:
-            print(self.__question_dict[qid])
+        self.__question_dict = {}
+        for q in question_list:
+            if q not in self.__question_dict.values():
+                self.__question_dict[q.qid] = q
         self.__size = len(self.__question_dict)     
     
     def add_question(self, q):
-        if q.qid in self.__question_dict.keys():
+        if q in self.__question_dict.values():
             return False
         self.__question_dict[q.qid] = q
         self.__size += 1
