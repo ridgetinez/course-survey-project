@@ -1,4 +1,4 @@
-#from models import admin
+from flask import session
 
 class UserAuthenticator(object):
     
@@ -14,12 +14,27 @@ class UserAuthenticator(object):
             tmp_users[user.getEmail()] = user
         self._users_dict = tmp_users
 
-    def authenticate(email, password):
-        user = self._users_dict[email]
+    def authenticate(self, email, password):
+        try:
+            user = self._users_dict[email]
+        except KeyError:
+            self.provideAdminSession(False)
+            return False
         if user.checkPassword(password):
+            self.provideAdminSession(True)
             return True
         else:
+            self.provideAdminSession(False)
             return False        
 
-    def provideAdminSession():
-        session["admin_flag"] = True
+    def provideAdminSession(self, boolean):
+        session["admin_flag"] = boolean
+
+    def checkAuthenticated(self):
+        try:
+            if session["admin_flag"] == True:
+                return True
+            else:
+                return False
+        except KeyError:
+            return False
