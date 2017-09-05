@@ -1,6 +1,8 @@
 
 # Agile Development Memes for Minjie Shen's teens
 
+
+
 class Question(object):
     """ Question object to populate question pools and surveys
     
@@ -27,12 +29,14 @@ class Question(object):
         return '{0} : {1}'.format(self.__question_text, self.__answer_list) 
 
     @property
-    def qid(self):
+    def id(self):
         return self.__qid
            
-    
     def add_answer_option(self, answer):
+        if answer in self.__answer_list:
+            return False 
         self.__answer_list.append(answer)
+        return True
 
 
 class QuestionStore(object):
@@ -45,13 +49,13 @@ class QuestionStore(object):
         self.__question_dict = {}
         for q in question_list:
             if q not in self.__question_dict.values():
-                self.__question_dict[q.qid] = q
+                self.__question_dict[q.id] = q
         self.__size = len(self.__question_dict)     
     
     def add_question(self, q):
         if q in self.__question_dict.values():
             return False
-        self.__question_dict[q.qid] = q
+        self.__question_dict[q.id] = q
         self.__size += 1
         return True
     
@@ -60,55 +64,44 @@ class QuestionStore(object):
             return self.__question_dict[qid]
         except:
             return None
+    
+    def get_all_questions(self):
+        return list(self.__question_dict.values())
 
 
-# class QuestionPool(QuestionStore):
-#     """ Retrieves the collection of created question
-#     
-#     Args:
-#     question_list -- list of questions created
-#     """
-#     
-#     def __init__(self, question_list):
-#         q_dict = {}
-#         for q in question_list:
-#             q_dict[q.qid] = q
-#         self.__question_dict = q_dict   
-#         
-#     def add_question(self, q):
-#         self.__question_dict[q.qid] = q
-#         
-#     def get_question(self, qid):
-#         return self.__question_dict[qid]
-# 
-# 
-# # USE NGROK FOR FLASK
-# class Survey(QuestionStore):
-#     """ Surveys holds a curated set of questions with response data
-#     
-#     Args:
-#     question_list -- list of questions appearing in the survey
-#     """
-#     
-#     usid = 0
-#     
-#     def __init__(self, question_list):
-#         self.question_list = set(question_list)
-#         self.sid = Survey.usid
-#         # create another dictionary which maps qid to survey responses list
-#         self.responses = pass
-#         Survey.usid += 1
-#     
-#     def retrieve_responses(self):
-#         pass
-#     
-#     def get_public_url(self):
-#         return "placeholderString"
-#         
-#         
-# class Course(object):
-#     pass
-#     
+# USE NGROK FOR FLASK
+class Survey(QuestionStore):
+    """ Surveys holds a curated set of questions with response data
+    
+    Args:
+    question_list -- list of questions appearing in the survey
+    """
+    
+    usid = 0
+    
+    def __init__(self, question_list, course_name):
+        super(Survey, self).__init__(question_list)
+        #self.__responses = list()
+        self.__course_name = course_name
+        self.__sid = Survey.usid
+        self.__public_url = '/survey/respond/{0}/{1}'.format(self.__course_name, self.__sid)
+        Survey.usid += 1
+    
+    @property
+    def id(self):
+        return self.__sid
+        
+    @property
+    def url(self):
+        return self.__public_url
+    
+    @property
+    def course(self):
+        return self.__course_name
+         
+         
+
+    
 
         
         
