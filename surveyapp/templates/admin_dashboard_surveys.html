@@ -25,6 +25,7 @@
             <div class="card">
                 <div class="card-header bg-dark text-white">Active Surveys</div>
                 <div class="card-body">
+                    <div style="text-align:right"><a href="#">Add Survey...</a></div>
                     <table class="table">
                         <th>
                             <td>Course Name</td>
@@ -38,8 +39,7 @@
                                 <td>{{ survey.getPublicURL() }}</td>
                             </tr>
                         {% endfor %}
-                    </table>
-                    <a href="#">Add Survey...</a>
+                    </table> 
                 </div>
             </div>
         </div>
