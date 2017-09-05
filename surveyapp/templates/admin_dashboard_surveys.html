@@ -1,0 +1,49 @@
+{% extends 'base_page.html' %}
+
+<!-- Page Title -->
+{% block title %}Admin Dashboard{% endblock %}
+
+<!-- Navbar -->
+{% block nav %}
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href=""> Surveys <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="questions"> Questions </a>
+      </li>
+    </ul>
+</div>
+{% endblock%}
+
+<!-- Page Content -->
+{% block content %}
+<div class="container" style="padding-top:20px">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">Active Surveys</div>
+                <div class="card-body">
+                    <table class="table">
+                        <th>
+                            <td>Course Name</td>
+                            <td>Survey ID</td>
+                            <td>Public URL</td>
+                        </th>
+                        {% for survey in surveys %}
+                            <tr>
+                                <td>{{ survey.getCourseName() }}</td>
+                                <td>{{ survey.getSurveyID() }}</td>
+                                <td>{{ survey.getPublicURL() }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    <a href="#">Add Survey...</a>
+                </div>
+            </div>
+        </div>
+    </div>     
+</div>
+
+{% endblock %}
