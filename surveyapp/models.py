@@ -27,16 +27,6 @@ class Question(object):
     
     def add_answer_option(self, answer):
         self.__answer_list.append(answer)
-        
-        
-firstQ = Question("How fucked are you for 1531?", ["Yes", "Yes in green", "si est verte"])
-print(firstQ)
-firstQ.add_answer_option("<3")
-print(firstQ)
-print(firstQ.qid)
-secondQ = Question("Did you really sleep when you have 1531?", ["Yes", "No", "No in yes."])
-print(secondQ.qid)
-
 
 
 
@@ -73,10 +63,7 @@ class QuestionPool(object):
         
         
     
-qp = QuestionPool([firstQ, secondQ])
-for q in qp:
-    print(q) 
-        
+
         
         
         
