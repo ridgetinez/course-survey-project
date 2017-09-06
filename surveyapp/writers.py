@@ -45,9 +45,9 @@ class ResponseWriter(Writer):
             for q in l:
                 response_writer.writerow(q)
 class SurveyWriter(Writer):
-    """ Writer specific for a survey's response
+    """ Writer specific for a survey
     Args:
-    survey -- responses recorded are for this specific survey
+    survey -- survey ID, course name and question IDs recorded are for this specific survey
     """
     
     def __init__(self, survey):
