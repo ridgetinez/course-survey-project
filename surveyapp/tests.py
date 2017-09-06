@@ -1,5 +1,5 @@
 from models import Question, QuestionStore, Survey
-from writers import ResponseWriter
+from writers import ResponseWriter, QuestionWriter
 from readers import CourseReader
 
 from models import Question, QuestionStore, Survey, Course
@@ -24,7 +24,6 @@ identical = Question("A", ['a', 'b', 'c', 'd'])
 store = QuestionStore([q1, q2, q3, q4, identical])
 
 # print out the dictionary that holds the question store
-print(store.get_question(q1.id).add_answer_option('hey'))
 print(store.get_question(q1.id))
 printStore(store)
 
@@ -61,3 +60,8 @@ print(comp2041.surveys, comp2041.id)
 comp2041.add_survey(survey)
 print(comp2041.surveys)
 print(comp2041.get_survey(survey.id))
+
+# QUESTION WRITER
+
+qWriter = QuestionWriter()
+qWriter.append_row(q1)
