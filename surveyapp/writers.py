@@ -18,7 +18,7 @@ class ResponseWriter(Writer):
     """
 
     def __init__(self, survey):
-        self.__csv_path = './static/response{0}.csv'.format(survey.id)
+        self.__csv_path = 'surveyapp/static/response{0}.csv'.format(survey.id)
         try:
             self.__csv_file = open(self.__csv_path)
             self.__csv_file.close()

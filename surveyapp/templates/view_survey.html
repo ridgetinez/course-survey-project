@@ -1,0 +1,40 @@
+{% extends 'base_page.html' %}
+
+<!-- Page Title -->
+{% block title %}{{ survey.course }}{% endblock %}
+
+<!-- Page Body -->
+{% block content %}
+<div class="container" style="padding-top:20px">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">{{ survey.course }}</div>
+                <div class="card-body">
+                    {% if error_not_answered %}
+                        <div class="alert alert-danger">You must answer all questions</div>
+                    {% endif %}
+                    {% if notif_success %}
+                        <div class="alert alert-success">Response Recieved</div>
+                    {% endif %}
+                    <form method="POST">
+                        {% for question in survey.get_all_questions() %}
+                            <p>{{ question.text }}</p>
+                                {% for answer in question.answer_list %}
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="radio" name="{{ question.id }}" value="{{question.answer_list.index(answer)}}">
+                                        {{ answer }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            <hr>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-dark">Submit</button>
+                    </form>
+                </div>    
+            </div>
+        </div>
+    </div>     
+</div>
+{% endblock %}
