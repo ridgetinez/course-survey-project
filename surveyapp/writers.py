@@ -63,4 +63,4 @@ class SurveyWriter(Writer):
             fieldnames = ['SID', 'COURSE', 'QID']
 
             survey_writer = csv.DictWriter(f, fieldnames=fieldnames, skipinitialspace=True)
-            survey_writer.writerow({'SID': survey.id, 'COURSE': survey.course, 'QID': [literal_eval(x.id) for x in survey.get_all_questions()]    })
+            survey_writer.writerow({'SID': survey.id, 'COURSE': survey.course, 'QID': [(x.id) for x in survey.get_all_questions()]    })
