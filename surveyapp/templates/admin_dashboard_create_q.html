@@ -7,27 +7,42 @@
 {% block content %}
 <div class="container" style="padding-top:20px">
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-12">
             <div class="card">
                 <div class="card-header bg-dark text-white">Create Question</div>
-                <div class="card-body">                    
+                <div class="card-body">
+                    {% if question_error %}
+                    <div class='alert alert-danger'>You need to enter a question</div>
+                    {% endif %}                    
+                    {% if answer_error %}
+                    <div class='alert alert-danger'>You either didn't enter enough answers/one or more answers is duplicate</div>
+                    {% endif %}
                     <form method="POST">
                         <div class="form-group">
                             <label for="question_text">Question:</label>
                             <input type="text" class="form-control" name="question_text"></input>
                         </div>
-                        {% for i in question.n_answers %}
+                        {% for i in range(n_answers) %}
                         <div class="form-group">
-                            <label for="answer{{i}}">Answer {{i}}</label>
+                            <label for="answer{{i}}">Answer:</label>
                             <input type="text" class="form-control" name="answer{{i}}"></input>
                         </div>
                         {% endfor %}
+                        {% if n_answers < 6 %}
                         <div class="form-group">
                             <button type="submit" name="add_answer" class="btn btn-dark">Add Answer</button>
                         </div>
- 
+                        {% endif %}
+                        {% if n_answers > 2 %}
+                         <div class="form-group">
+                            <button type="submit" name="remove_answer" class="btn btn-dark">Remove Answer</button>
+                        </div>                       
+                        {% endif%}
                         <div class="form-group">
-                            <button type="submit" class="btn btn-dark">Login</button>
+                            <button type="submit" class="btn btn-dark">Submit</button>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" name="cancel" class="btn btn-danger">Cancel</button>
                         </div>
                     </form>
                 </div>

@@ -36,18 +36,13 @@ class Question(object):
     def num_answers(self):
         return self.__num_answers
 
-    def add_answer_option(self, answer):
-        """ Append answer to question checking for duplicates
+    @property
+    def text(self):
+        return self.__question_text
 
-        Args:
-        answer -- string representing new answer option
-        """
-        if answer in self.__answer_list:
-            return False
-        self.__answer_list.append(answer)
-        self.__num_answers += 1
-        return True
-
+    @property
+    def answer_list(self):
+        return self.__answer_list
 
 class QuestionStore(object):
     """ Super-class for question container classes
