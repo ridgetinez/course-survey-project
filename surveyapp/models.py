@@ -45,6 +45,7 @@ class Question(object):
         if answer in self.__answer_list:
             return False
         self.__answer_list.append(answer)
+        self.__num_answers += 1
         return True
 
 
@@ -149,7 +150,7 @@ class Admin(object):
         else:
             return False
 
-
+          
 class Course(object):
     """ Container of Survey Instances
 

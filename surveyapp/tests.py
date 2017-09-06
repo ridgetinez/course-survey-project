@@ -1,6 +1,12 @@
+from models import Question, QuestionStore, Survey
+from writers import ResponseWriter
+from readers import CourseReader
+
 from models import Question, QuestionStore, Survey, Course
 from readers import CourseReader
+
 import unittest
+
 
 def printStore(store):
     for item in store.get_all_questions():
@@ -36,6 +42,11 @@ printStore(store)
 survey = Survey([q1, q2, q3, q4, identical], "COMP6331")
 printStore(survey)
 print(survey.course)
+
+# RESPONSE WRITER
+w = ResponseWriter(survey)
+w.update_row(q1.id, 2)
+w.update_row(q1.id, 0)
 
 # COURSE READER TEST
 cr = CourseReader()
