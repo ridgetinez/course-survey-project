@@ -15,7 +15,8 @@ class Question(object):
         
     def __init__(self, question_text, answer_list):
         self.__question_text = question_text
-        self.__answer_list = answer_list
+        self.__answer_list = list(set(answer_list))
+        self.__num_answers = len(self.__answer_list)
         self.__qid = Question.uqid
         Question.uqid += 1
     
@@ -31,6 +32,10 @@ class Question(object):
     @property
     def id(self):
         return self.__qid
+    
+    @property
+    def num_answers(self):
+        return self.__num_answers
            
     def add_answer_option(self, answer):
         if answer in self.__answer_list:
