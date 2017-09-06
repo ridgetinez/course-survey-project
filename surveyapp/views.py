@@ -41,6 +41,11 @@ def admin_dashboard(sub_page):
 
 @app.route('/dashboard/add/question', methods=['GET', 'POST'])
 def admin_dashboard_add_q():
+
+    #non-authenticated user attempts access
+    if authenticator.checkAuthenticated() == False:
+        return redirect(url_for('index'))
+    
     if request.method == 'POST':
         #catch these first
         if 'add_answer' in request.form:
@@ -81,6 +86,10 @@ def admin_dashboard_add_q():
 
 @app.route('/dashboard/add/survey', methods=['GET', 'POST'])
 def admin_dashboard_add_s():
+    #non-authenticated user attempts access
+    if authenticator.checkAuthenticated() == False:
+        return redirect(url_for('index'))  
+    
     #create course list
     course_list = []
     for course in readers.CourseReader.read(None, "surveyapp/static/courses.csv"):
@@ -104,6 +113,10 @@ def admin_dashboard_add_s():
 
 @app.route('/survey/respond/<course_id>/<survey_id>', methods=['POST', 'GET'])
 def respond(course_id, survey_id):
+    #non-authenticated user attempts access
+    if authenticator.checkAuthenticated() == False:
+        return redirect(url_for('index'))   
+    
     try:
         survey = surveys[int(survey_id)]
     except IndexError: #survey doesn't exist
