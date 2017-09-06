@@ -8,6 +8,7 @@ questions = []
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    """ Returns/renders the admin dashboard page (if access authorised) or the landing page (if access not authorised) """
     if request.method == 'POST':
         
         #attempt to authenticate user using information from login form
@@ -22,6 +23,8 @@ def index():
 
 @app.route('/dashboard/<sub_page>')
 def admin_dashboard(sub_page):
+    """ Returns/renders the survey/questions creation page or an index page (if unauthorised user access URL) """
+    
     #non-authenticated user attempts access
     if authenticator.checkAuthenticated() == False:
         return redirect(url_for('index'))
@@ -33,6 +36,7 @@ def admin_dashboard(sub_page):
 
 @app.route('/dashboard/add/<add_type>', methods=['GET', 'POST'])
 def admin_dashboard_add(add_type):
+    """ Returns/renders 'add questions' page """
     if request.method == 'POST':
         #catch these first
         if 'add_answer' in request.form:
