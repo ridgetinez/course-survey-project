@@ -1,4 +1,4 @@
-from surveyapp import app, authenticator, models
+from surveyapp import app, authenticator, models, readers
 from flask import render_template, session, redirect, url_for, request
 
 #TEMPORARY
@@ -71,6 +71,11 @@ def admin_dashboard_add_q():
 
 @app.route('/dashboard/add/survey', methods=['GET', 'POST'])
 def admin_dashboard_add_s():
+    #create course list    
+    course_list = []
+    for course in readers.CourseReader.read(None, "surveyapp/static/courses.csv"):
+        course_list.append("".join(course))
+    
     if request.method == 'POST':
         #catch cancel
         if 'cancel' in request.form:
@@ -81,8 +86,8 @@ def admin_dashboard_add_s():
             if str(i) in request.form:
                 selected_questions.append(questions[i])
         if len(selected_questions) == 0:
-            return render_template('admin_dashboard_create_survey.html', questions=questions, course_list=['cs2521'], selection_error=True)
+            return render_template('admin_dashboard_create_survey.html', questions=questions, course_list=course_list, selection_error=True)
         surveys.append(models.Survey(selected_questions, course_name))
         return redirect(url_for('admin_dashboard', sub_page='surveys'))
 
-    return render_template('admin_dashboard_create_survey.html', questions=questions, course_list=['cs2521'])
+    return render_template('admin_dashboard_create_survey.html', questions=questions, course_list=course_list)
