@@ -10,7 +10,10 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header bg-dark text-white">Create Survey</div>
-                <div class="card-body">               
+                <div class="card-body">
+                    {% if selection_error %}
+                    <div class="alert alert-danger">You must select at least one question</div>              
+                    {% endif %} 
                     <form method="POST">
                         <div class="form-group">
                             <label for="course_name">Choose Course:</label>

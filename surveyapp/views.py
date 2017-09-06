@@ -80,6 +80,9 @@ def admin_dashboard_add_s():
         for i in range(len(questions)):
             if str(i) in request.form:
                 selected_questions.append(questions[i])
+        if len(selected_questions) == 0:
+            return render_template('admin_dashboard_create_survey.html', questions=questions, course_list=['cs2521'], selection_error=True)
         surveys.append(models.Survey(selected_questions, course_name))
         return redirect(url_for('admin_dashboard', sub_page='surveys'))
+
     return render_template('admin_dashboard_create_survey.html', questions=questions, course_list=['cs2521'])
