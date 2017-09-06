@@ -33,7 +33,7 @@ class Question(object):
 
     @property
     def num_answers(self):
-        return self.__num_answers
+        return len(self.__answer_list)
 
     @property
     def text(self):
