@@ -25,18 +25,16 @@
             <div class="card">
                 <div class="card-header bg-dark text-white">Active Surveys</div>
                 <div class="card-body">
-                    <div style="text-align:right"><a href="#">Add Survey...</a></div>
+                    <div style="text-align:right"><a href="add/survey">Add Survey...</a></div>
                     <table class="table">
-                        <th>
-                            <td>Course Name</td>
-                            <td>Survey ID</td>
-                            <td>Public URL</td>
-                        </th>
+                        <th>Course Name</th>
+                        <th>Survey ID</th>
+                        <th>Public URL</th>
                         {% for survey in surveys %}
                             <tr>
-                                <td>{{ survey.getCourseName() }}</td>
-                                <td>{{ survey.getSurveyID() }}</td>
-                                <td>{{ survey.getPublicURL() }}</td>
+                                <td>{{ survey.course }}</td>
+                                <td>{{ survey.id }}</td>
+                                <td>{{ survey.url }}</td>
                             </tr>
                         {% endfor %}
                     </table> 

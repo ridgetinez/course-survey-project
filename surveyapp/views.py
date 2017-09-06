@@ -4,6 +4,8 @@ from flask import render_template, session, redirect, url_for, request
 #TEMPORARY
 global questions
 questions = []
+global surveys
+surveys = []
 #TEMPORARY
 
 @app.route('/', methods=['GET', 'POST'])
@@ -27,12 +29,12 @@ def admin_dashboard(sub_page):
         return redirect(url_for('index'))
 
     if sub_page == 'surveys':
-        return render_template('admin_dashboard_surveys.html')
+        return render_template('admin_dashboard_surveys.html', surveys=surveys)
     if sub_page == 'questions':
         return render_template('admin_dashboard_questions.html', questions=questions)
 
-@app.route('/dashboard/add/<add_type>', methods=['GET', 'POST'])
-def admin_dashboard_add(add_type):
+@app.route('/dashboard/add/question', methods=['GET', 'POST'])
+def admin_dashboard_add_q():
     if request.method == 'POST':
         #catch these first
         if 'add_answer' in request.form:
@@ -65,5 +67,19 @@ def admin_dashboard_add(add_type):
 
     #if first time form reached
     session['n_answers'] = 4
-    if add_type == "question":
-        return render_template('admin_dashboard_create_q.html', n_answers=session['n_answers'])
+    return render_template('admin_dashboard_create_q.html', n_answers=session['n_answers'])
+
+@app.route('/dashboard/add/survey', methods=['GET', 'POST'])
+def admin_dashboard_add_s():
+    if request.method == 'POST':
+        #catch cancel
+        if 'cancel' in request.form:
+            return redirect(url_for('admin_dashboard', sub_page='surveys'))
+        selected_questions = []
+        course_name = request.form["course_name"]
+        for i in range(len(questions)):
+            if str(i) in request.form:
+                selected_questions.append(questions[i])
+        surveys.append(models.Survey(selected_questions, course_name))
+        return redirect(url_for('admin_dashboard', sub_page='surveys'))
+    return render_template('admin_dashboard_create_survey.html', questions=questions, course_list=['cs2521'])
