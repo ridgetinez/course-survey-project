@@ -9,6 +9,7 @@ import unittest
 
 
 def printStore(store):
+    """ Prints all questions stored """
     for item in store.get_all_questions():
         print(item)
     print("\n\n")
