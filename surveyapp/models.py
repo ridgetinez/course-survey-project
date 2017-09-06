@@ -1,5 +1,5 @@
 # Agile Development Memes for Minjie Shen's teens
-
+import csv
 
 
 class Question(object):
@@ -37,6 +37,11 @@ class Question(object):
         return self.__num_answers
 
     def add_answer_option(self, answer):
+        """ Append answer to question checking for duplicates
+
+        Args:
+        answer -- string representing new answer option
+        """
         if answer in self.__answer_list:
             return False
         self.__answer_list.append(answer)
@@ -144,3 +149,46 @@ class Admin(object):
             return True
         else:
             return False
+
+          
+class Course(object):
+    """ Container of Survey Instances
+
+    Args:
+    course_id -- unique label for the course in form COMPXXXX
+    session   -- which year and semester the course is running
+    """
+
+    def __init__(self, course_id, session):
+        self.__course_id = course_id
+        self.__session = session
+        self.__surveys = []
+
+    def __str__(self):
+        return "{0}:{1}".format(self.__course_id, self.__session)
+
+    def add_survey(self, survey):
+        """ Appends a survey to the courses list of surveys
+
+        Args:
+        survey -- survey to be labelled under Course instance
+        """
+        return self.__surveys.append(survey) # does not check for duplicates
+
+    def get_survey(self, sid):
+        """ Return specific survey by survey id
+
+        Args:
+        sid -- unique survey integer identifier
+        """
+        for s in self.__surveys:
+            if s.id == sid:
+                return s
+
+    @property
+    def id(self):
+        return self.__course_id
+
+    @property
+    def surveys(self):
+        return self.__surveys
