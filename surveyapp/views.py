@@ -41,12 +41,23 @@ def admin_dashboard_add(add_type):
         if 'remove_answer' in request.form:
             session['n_answers'] -= 1
             return render_template('admin_dashboard_create_q.html', n_answers=session['n_answers'])
+        if 'cancel' in request.form:
+            session.pop('n_answers')
+            return redirect(url_for('admin_dashboard', sub_page='questions'))
 
         #otherwise write question and redirect
         question_text = request.form['question_text']
         answers = []
         for i in range(session['n_answers']):
             answers.append(request.form['answer' + str(i)])
+        
+        #catch form input errors
+        if question_text == "":
+            return render_template('admin_dashboard_create_q.html', question_error=True, n_answers=session['n_answers'])
+        if "" in answers:
+            return render_template('admin_dashboard_create_q.html', answer_error=True, n_answers=session['n_answers'])
+        
+        #create and save question
         new_question = models.Question(question_text, answers)
         session.pop('n_answers')
         questions.append(new_question) 
