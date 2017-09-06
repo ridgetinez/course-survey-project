@@ -1,0 +1,61 @@
+{% extends 'base_page.html' %}
+
+<!-- Page Title -->
+{% block title %}Create Survey{% endblock %}
+
+<!-- Page Body -->
+{% block content %}
+<div class="container" style="padding-top:20px">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">Create Survey</div>
+                <div class="card-body">
+                    {% if selection_error %}
+                    <div class="alert alert-danger">You must select at least one question</div>              
+                    {% endif %} 
+                    <form method="POST">
+                        <div class="form-group">
+                            <label for="course_name">Choose Course:</label>
+                            <select class="form-control" name="course_name">
+                                {% for course in course_list %}
+                                    <option>{{ course }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <table class="table">
+                            {% for question in questions %}
+                            <tr>
+                                <td>
+                                    <div class="form-check">
+                                        <label class="form-check-label">
+                                            <input class="form-check-input" type="checkbox" name="{{question.id}}">
+                                        </label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <p>{{question.text}}</p>
+                                    <ul>
+                                        {% for answer in question.answer_list %}
+                                            <li>{{ answer }}</li>
+                                        {% endfor%}
+                                    </ul>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </table>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-dark">Submit</button>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-danger" name="cancel">Cancel</button>
+                        </div>
+                    </form>
+                 </div>
+            </div>
+        </div>
+    </div>     
+</div>
+{% endblock %}
