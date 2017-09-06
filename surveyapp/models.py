@@ -1,10 +1,10 @@
+
 # Agile Development Memes for Minjie Shen's teens
 import csv
 
 
 class Question(object):
     """ Question object to populate question pools and surveys
-
     Args:
     question_text -- String of the question displayed to user
     answer_list   -- Tuple of strings representing multiple choice answers
@@ -46,7 +46,6 @@ class Question(object):
 
 class QuestionStore(object):
     """ Super-class for question container classes
-
     Args:
     question_list -- list of questions to be stored in container
     """
@@ -77,7 +76,6 @@ class QuestionStore(object):
 # USE NGROK FOR FLASK
 class Survey(QuestionStore):
     """ Surveys holds a curated set of questions with response data
-
     Args:
     question_list -- list of questions appearing in the survey
     """
@@ -107,7 +105,6 @@ class Survey(QuestionStore):
 
 class Admin(object):
     """ Question object to populate question pools and surveys
-
     Args:
     email -- Admin's email
     password   -- Admin's password
@@ -148,7 +145,6 @@ class Admin(object):
           
 class Course(object):
     """ Container of Survey Instances
-
     Args:
     course_id -- unique label for the course in form COMPXXXX
     session   -- which year and semester the course is running
@@ -164,7 +160,6 @@ class Course(object):
 
     def add_survey(self, survey):
         """ Appends a survey to the courses list of surveys
-
         Args:
         survey -- survey to be labelled under Course instance
         """
@@ -172,7 +167,6 @@ class Course(object):
 
     def get_survey(self, sid):
         """ Return specific survey by survey id
-
         Args:
         sid -- unique survey integer identifier
         """
