@@ -47,12 +47,13 @@ print(survey.course)
 # CONTROLLER TEST
 controller = SurveyController(survey)
 controller.set_response(q1.id, "HELLO")
+controller.set_response(q1.id, "HELLsssO")
 controller.set_response(q2.id, "HELLOsss")
 
 for item in controller.response.items():
     print(item)
 print("\n\n")
-controller.write_csv(q1.id)
+controller.write_csv()
 
 
 

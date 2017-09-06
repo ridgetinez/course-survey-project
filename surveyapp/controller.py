@@ -43,12 +43,15 @@ class SurveyController(object):
     #		return True
     #	except:
     #		return False
-    def write_csv (self, qid):
+    def write_csv (self):
     	with open ('response.csv', 'w')  as csvfile:
-    		fieldnames = ['ID', 'response']
+    		fieldnames = ['ID','response']
+    		ID = 0;
     		writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-    		for line in self.__response.values():
-    			writer.writerow({'ID' : qid, 'response': self.__response[qid]})
+    		for line in self.__response.values():    			
+    			writer.writerow({'ID': ID , 'response': line})
+    			ID = ID + 1
+   
     @property
     def response(self):
     	return self.__response		
