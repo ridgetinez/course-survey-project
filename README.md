@@ -39,15 +39,15 @@ __\_\_init\_\_.py__ - Tells python that this directory is actually a python modu
 
 __auth.py__ - Contains class that authenticates an admin at the login screen
 
-__controller.py__ - 
+__controller.py__ - holds surveyController which contains methods to display the survey to respondents
 
 __models.py__ - Contain classes that act as data models
 
-__readers.py__ - 
+__readers.py__ - reads data from csv files 
 
 __views.py__ - Holds all of the url/route information
 
-__writers.py__ - 
+__writers.py__ - write data to csv files
 
 
 __static/__ - Contains static files eg. images, css
