@@ -12,7 +12,9 @@ WORKFLOW
 3. Pushes to the remote branch.
 4. Submits a pull request to merge back into master.
 5. Team reviews and either suggests fixes or merges to master branch.
-6. Dev is happy.
+6. Coders note any changes/tasks completed in tasks logs
+7. Documenter notes these changes in all documentation (UML Diagrams, Task Logs, Charts, etc.)
+8. Dev is happy.
 
 
 ## Project Structure
