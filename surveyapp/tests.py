@@ -1,8 +1,15 @@
 from models import Question, QuestionStore, Survey
+from controller import SurveyController
 import unittest
+import csv
 
 def printStore(store):
     for item in store.get_all_questions():
+        print(item)
+    print("\n\n")
+
+def printResponse(store):
+    for item in store.response():
         print(item)
     print("\n\n")
 
@@ -34,7 +41,19 @@ printStore(store)
 # SURVEY TEST
 survey = Survey([q1, q2, q3, q4, identical], "COMP6331")
 printStore(survey)
+
 print(survey.course)
+
+# CONTROLLER TEST
+controller = SurveyController(survey)
+controller.set_response(q1.id, "HELLO")
+controller.set_response(q2.id, "HELLOsss")
+
+for item in controller.response.items():
+    print(item)
+print("\n\n")
+controller.write_csv(q1.id)
+
 
 
 
