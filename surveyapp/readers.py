@@ -1,8 +1,8 @@
-from abc import abstractmethod
+from abc import ABCMeta, abstractmethod
 import csv
 
 
-class CSVReader(object):
+class CSVReader(metaclass=ABCMeta):
     """ Super-class for reading specific DB formats
 
     Args:
