@@ -6,7 +6,10 @@
 * Favouring lots of aggregation and composition relationships as building blocks for the survey app. At the moment, we don't see the need to absurdly go crazy with multiple inheritances. So with that, we'll be happy suffering a bit more coupling for an easier development experience.
 
 ### FRONTEND DESIGN DECISIONS
-* SSMYTH2 is our bootstrap man. The man, the myth, the OG MinjieShen teen.
+* All templates are designed to have the same theme, most notably the dark navigation bar. Gives off a professional, easy-to-use user interface feel for the admin 
+* General flow for the admin dashboard consists of the landing page (left side - login details, right side - access survey via URL) which directs to the dashboard. In the dashboard there are two main tabs (so far), one for 'create survey' and one for 'create questions'
+* Sam decided to set boundaries of the number of answers available for each question (minimum 2 radio buttons, maximum 6 radio buttons)
+* Cancel buttons where added to the 'create survey' and 'create questions' form to enhance user experience
 
 
 ### TEAM OPTIMISATION DECISIONS
