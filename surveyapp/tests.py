@@ -1,4 +1,5 @@
-from models import Question, QuestionStore, Survey
+from models import Question, QuestionStore, Survey, Course
+from readers import CourseReader
 import unittest
 
 def printStore(store):
@@ -20,7 +21,7 @@ store = QuestionStore([q1, q2, q3, q4, identical])
 print(store.get_question(q1.id).add_answer_option('hey'))
 print(store.get_question(q1.id))
 printStore(store)
-    
+
 # adding a question to an existing question pool
 qNew = Question("E", ['f', 'g', 'h', 'i'])
 store.add_question(qNew)
@@ -36,5 +37,16 @@ survey = Survey([q1, q2, q3, q4, identical], "COMP6331")
 printStore(survey)
 print(survey.course)
 
+# COURSE READER TEST
+cr = CourseReader()
+for item in cr.read('./static/courses.csv'):
+    print(item)
+print('\n\n')
 
-
+# COURSE TEST
+courses = cr.read('./static/courses.csv')
+comp2041 = Course(courses[0][0], courses[0][1])
+print(comp2041.surveys, comp2041.id)
+comp2041.add_survey(survey)
+print(comp2041.surveys)
+print(comp2041.get_survey(survey.id))
