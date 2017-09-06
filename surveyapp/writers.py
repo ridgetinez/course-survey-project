@@ -33,13 +33,17 @@ class ResponseWriter(Writer):
         with open(self.__csv_path, 'r') as f:
             tmp_list = list(csv.reader(f, delimiter=' '))
             unstringify = [[literal_eval(x[0]), literal_eval(x[1])] for x in tmp_list]
+            print(unstringify)
             return unstringify
 
     def update_row(self, qid, ans_index):
         """ Increment csv to add a response to a given question """
         l = self.__csv_to_list(qid, ans_index)
-        row = [x for x in l if qid in x][0]
-        l[l.index(row)][1][ans_index] += 1
+        # for i, x in enumerate(l):
+        #     if int(qid) in x:
+        #         l[i][1][int(ans_index)] += 1
+        row = [x for x in l if int(qid) in x][0]
+        l[l.index(row)][1][int(ans_index)] += 1
         with open(self.__csv_path, 'w') as f:
             response_writer = csv.writer(f, delimiter=' ')
             for q in l:

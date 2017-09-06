@@ -28,7 +28,7 @@ def index():
 @app.route('/dashboard/<sub_page>')
 def admin_dashboard(sub_page):
     """ Returns/renders the survey/questions creation page or an index page (if unauthorised user access URL) """
-    
+
     #non-authenticated user attempts access
     if authenticator.checkAuthenticated() == False:
         return redirect(url_for('index'))
@@ -45,7 +45,7 @@ def admin_dashboard_add_q():
         #catch these first
         if 'add_answer' in request.form:
             session['n_answers'] += 1
-            return render_template('admin_dashboard_create_q.html', n_answers=session['n_answers'])    
+            return render_template('admin_dashboard_create_q.html', n_answers=session['n_answers'])
         if 'remove_answer' in request.form:
             session['n_answers'] -= 1
             return render_template('admin_dashboard_create_q.html', n_answers=session['n_answers'])
@@ -58,7 +58,7 @@ def admin_dashboard_add_q():
         answers = []
         for i in range(session['n_answers']):
             answers.append(request.form['answer' + str(i)])
-        
+
         #catch form input errors
         if question_text == "":
             return render_template('admin_dashboard_create_q.html', question_error=True, n_answers=session['n_answers'])
@@ -66,13 +66,13 @@ def admin_dashboard_add_q():
             return render_template('admin_dashboard_create_q.html', answer_error=True, n_answers=session['n_answers'])
          #check unique answers
         if len(set(answers)) < len(answers):
-            return render_template('admin_dashboard_create_q.html', answer_error=True, n_answers=session['n_answers'])       
- 
+            return render_template('admin_dashboard_create_q.html', answer_error=True, n_answers=session['n_answers'])
+
         #create and save question
         new_question = models.Question(question_text, answers)
 
         session.pop('n_answers')
-        questions.add_question(new_question) 
+        questions.add_question(new_question)
         return redirect(url_for('admin_dashboard', sub_page='questions'))
 
     #if first time form reached
@@ -85,7 +85,7 @@ def admin_dashboard_add_s():
     course_list = []
     for course in readers.CourseReader.read(None, "surveyapp/static/courses.csv"):
         course_list.append("".join(course))
-    
+
     if request.method == 'POST':
         #catch cancel
         if 'cancel' in request.form:
@@ -114,7 +114,8 @@ def respond(course_id, survey_id):
         if len(request.form) < len(survey.get_all_questions()):
             return render_template("view_survey.html", survey=survey, error_not_answered=True)
         writer = writers.ResponseWriter(survey)
-        #for question_id, answer_id in request.form.items(): UNCOMMENT WHEN WRITER IS DONE
-            #writer.update_row(question_id, answer_id) UNCOMMENT WHEN WRITER IS DONE
+        print(request.form.items())
+        for question_id, answer_id in request.form.items():
+            writer.update_row(question_id, answer_id)
         return render_template("view_survey.html", survey=survey, notif_success=True)
-    return render_template("view_survey.html", survey=survey)   
+    return render_template("view_survey.html", survey=survey)
