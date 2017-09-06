@@ -20,7 +20,7 @@ class SurveyController(object):
         # GET QUESTION AND THEN		
     	self.__response[qid] = ans_index
  
-   # def get_next_question(self, qid):
+   	# def get_next_question(self, qid):
     #	if SurveyController.has_next_question is True:
     #		return self.__survey.get_question(qid + 1) 
     #	else:
