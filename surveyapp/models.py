@@ -15,7 +15,6 @@ class Question(object):
     def __init__(self, question_text, answer_list):
         self.__question_text = question_text
         self.__answer_list = list(set(answer_list))
-        self.__num_answers = len(self.__answer_list)
         self.__qid = Question.uqid
         Question.uqid += 1
 
@@ -145,7 +144,7 @@ class Admin(object):
         else:
             return False
 
-          
+
 class Course(object):
     """ Container of Survey Instances
 
