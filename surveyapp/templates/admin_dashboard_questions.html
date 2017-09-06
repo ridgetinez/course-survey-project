@@ -25,14 +25,14 @@
             <div class="card">
                 <div class="card-header bg-dark text-white">Questions</div>
                 <div class="card-body">
-                    <div style="text-align:right"><a href="#">Add Question...</a></div>
+                    <div style="text-align:right"><a href="add/question">Add Question...</a></div>
                     <table class="table">
                         <th>
                             <td>Question</td>
                             <td>Question ID</td>
                             <td>Answers</td>
                         </th>
-                        {% for survey in surveys %}
+                        {% for question in questions %}
                             <tr>
                                 <td>{{ question.getText() }}</td>
                                 <td>{{ question.getID() }}</td>i
