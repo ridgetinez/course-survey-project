@@ -27,16 +27,22 @@
                 <div class="card-body">
                     <div style="text-align:right"><a href="add/question">Add Question...</a></div>
                     <table class="table">
-                        <th>
-                            <td>Question</td>
-                            <td>Question ID</td>
-                            <td>Answers</td>
-                        </th>
+                        <tr>
+                            <th>Question ID</th>
+                            <th>Question</th>
+                            <th>Answers</th>
+                        </tr>
                         {% for question in questions %}
                             <tr>
-                                <td>{{ question.getText() }}</td>
-                                <td>{{ question.getID() }}</td>i
-                                <td>{{ question.getAnswers() }}</td>
+                                <td><p>{{ question.id }}</p></td>
+                                <td>{{ question.text }}</td>
+                                <td>
+                                    <ul>
+                                    {% for answer in question.answer_list %}
+                                        <li>{{ answer }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                </td>
                             </tr>
                         {% endfor %}
                     </table>

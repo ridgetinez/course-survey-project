@@ -35,13 +35,14 @@ class Question(object):
     @property
     def num_answers(self):
         return self.__num_answers
-           
-    def add_answer_option(self, answer):
-        if answer in self.__answer_list:
-            return False 
-        self.__answer_list.append(answer)
-        return True
 
+    @property
+    def text(self):
+        return self.__question_text
+
+    @property
+    def answer_list(self):
+        return self.__answer_list
 
 class QuestionStore(object):
     """ Super-class for question container classes

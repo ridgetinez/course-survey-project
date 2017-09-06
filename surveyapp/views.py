@@ -1,6 +1,11 @@
 from surveyapp import app, authenticator, models
 from flask import render_template, session, redirect, url_for, request
 
+#TEMPORARY
+global questions
+questions = []
+#TEMPORARY
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
@@ -24,7 +29,7 @@ def admin_dashboard(sub_page):
     if sub_page == 'surveys':
         return render_template('admin_dashboard_surveys.html')
     if sub_page == 'questions':
-        return render_template('admin_dashboard_questions.html')
+        return render_template('admin_dashboard_questions.html', questions=questions)
 
 @app.route('/dashboard/add/<add_type>', methods=['GET', 'POST'])
 def admin_dashboard_add(add_type):
@@ -44,7 +49,7 @@ def admin_dashboard_add(add_type):
             answers.append(request.form['answer' + str(i)])
         new_question = models.Question(question_text, answers)
         session.pop('n_answers')
-        print(new_question) #THIS IS THE COMPLETED QUESTION TO BE WRITTEN
+        questions.append(new_question) 
         return redirect(url_for('admin_dashboard', sub_page='questions'))
 
     #if first time form reached
