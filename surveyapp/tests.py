@@ -1,8 +1,7 @@
 from models import Question, QuestionStore, Survey
 from writers import ResponseWriter, SurveyWriter
-from readers import CourseReader
 from models import Question, QuestionStore, Survey, Course
-from readers import CourseReader
+from readers import CourseReader, SurveyReader
 import unittest
 def printStore(store):
     for item in store.get_all_questions():
@@ -31,11 +30,24 @@ survey = Survey([q1, q2, q3, q4, identical], "COMP6331")
 printStore(survey)
 print(survey.course)
 # RESPONSE WRITER
-# COURSE READER TEST
 
+# SURVEY WRITER  TEST
 v = SurveyWriter(survey)
 v.append_row(survey)
 
+#SURVEY READER TEST
+#sr = SurveyReader()
+#for item in sr.read('./static/survey.csv'):
+#    print(item)
+#print('\n\n')
+#surveys = sr.read('./static/survey.csv')
+#COMP6331 = Survey([q1, q2, q3, q4, identical], surveys[0][1])
+#print(comp6331.id, comp6331.course)
+#printStore(COMP6331)
+
+
+
+# COURSE READER TEST
 cr = CourseReader()
 for item in cr.read('./static/courses.csv'):
     print(item)
