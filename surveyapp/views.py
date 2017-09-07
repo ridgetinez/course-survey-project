@@ -113,10 +113,7 @@ def admin_dashboard_add_s():
 
 @app.route('/survey/respond/<course_id>/<survey_id>', methods=['POST', 'GET'])
 def respond(course_id, survey_id):
-    #non-authenticated user attempts access
-    if authenticator.checkAuthenticated() == False:
-        return redirect(url_for('index'))   
-    
+      
     try:
         survey = surveys[int(survey_id)]
     except IndexError: #survey doesn't exist
