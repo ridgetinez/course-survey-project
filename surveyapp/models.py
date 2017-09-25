@@ -104,46 +104,64 @@ class Survey(QuestionStore):
         return self.__course_name
 
 
-class Admin(object):
-    """ Question object to populate question pools and surveys
+class User(object):
+    """ User object acts as superclass for different types of users
 
     Args:
-    email -- Admin's email
-    password   -- Admin's password
+    password   -- User's password
+    identifier -- User's identifier
     """
 
-    uaID = 0
-
-    def __init__(self, email, password):
-        self.__email = email
+    def __init__(self, identifier, password):
+        self.__identifier = identifier
         self.__password = password
-        self.__aID = Admin.uaID
-        Admin.uaID += 1
 
     def __eq__(self, other):
-        return self.__email == other.__email
+        return self.__identifier == other.__identifier
 
     def __hash__(self):
-        return hash(self.__aID)
+        return hash(self.__identifier)
 
     def __str__(self):
-        return '{0} : {1}'.format(self.__aID, self.__email)
+        return self.__identifier
 
-    #getter function for admin id
-    def getAdminID(self):
-        return self.__aID
-
-    #getter function for admin email
-    def getEmail(self):
-        return self.__email
-
-    #checks if password matches admin's password
-    def checkPassword(self, password):
+    #checks if password matches User's password
+    def check_password(self, password):
         if password == self.__password:
             return True
         else:
             return False
 
+class Admin(User):
+    pass
+
+class Staff(User):
+    def __init__(self, identifier, password, classes):
+        self.__classes = classes
+        super(Staff, self).__init__(identifer, password)
+
+    def validate_identifier():
+        if (self.__identifier.isdigit()):
+            return True
+        else:
+            return False
+
+    def get_classes(self):
+        return self.__classes
+
+class Student(User):
+    def __init__(self, identifier, password, enrolement):
+        self.__enrolement = enrolement
+        super(Student, self).__init__(identifer, password)
+
+    def validate_identifier():
+        if (self.__identifier.isdigit()):
+            return True
+        else:
+            return False
+
+    def get_enrolement(self):
+        return self.__enrolement
 
 class Course(object):
     """ Container of Survey Instances
