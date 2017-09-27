@@ -1,19 +1,21 @@
 from flask import session
 
 class UserAuthenticator(object):
-    
+
     """ contains methods for authenticating users
 
     Args:
     user_list -- list of admin users
     """
-    
-    def __init__(self, user_list):
+
+    def __init__(self):
+        """
         tmp_users = {}
         #initialises dict of admins with emails as key
         for user in user_list:
             tmp_users[user.getEmail()] = user
         self._users_dict = tmp_users
+        """
 
     #attempts to authenticate a user when provided with email and password
     def authenticate(self, email, password):
@@ -30,7 +32,7 @@ class UserAuthenticator(object):
         else:
             #flag the user as a non-admin
             self.provideAdminSession(False)
-            return False        
+            return False
 
     #flags the user as either an admin or a non-admin dependent on boolean
     def provideAdminSession(self, boolean):
