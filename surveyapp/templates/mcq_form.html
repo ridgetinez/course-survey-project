@@ -1,0 +1,27 @@
+{% if answer_error %}
+<div class='alert alert-danger'>You either didn't enter enough answers/one or more answers is duplicate</div>
+{% endif %}
+
+<div class="form-group">
+    <label for="question_text">Question:</label>
+    <input type="text" class="form-control" name="question_text"></input>
+</div>
+{% for i in range(n_answers) %}
+<div class="form-group">
+    <label for="answer{{i}}">Answer:</label>
+    <input type="text" class="form-control" name="answer{{i}}"></input>
+</div>
+{% endfor %}
+{% if n_answers < 6 %}
+<div class="form-group">
+    <button type="submit" name="add_answer" class="btn btn-dark">Add Answer</button>
+</div>
+{% endif %}
+{% if n_answers > 2 %}
+ <div class="form-group">
+    <button type="submit" name="remove_answer" class="btn btn-dark">Remove Answer</button>
+</div>
+{% endif%}
+<div class="form-group">
+    <button type="submit" class="btn btn-dark">Submit</button>
+</div>

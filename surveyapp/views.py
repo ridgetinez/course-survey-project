@@ -39,19 +39,20 @@ def admin_dashboard(sub_page):
         return render_template('admin_dashboard_questions.html', questions=questions.get_all_questions())
 
 
-@app.route('/dashboard/add/question', methods=['GET', 'POST'])
-def admin_dashboard_add_q():
+@app.route('/dashboard/add/question/<qtype>', methods=['GET', 'POST'])
+def admin_dashboard_add_q(qtype):
     if request.method == 'POST':
         #catch these first
+        print(request.form)
         if 'add_answer' in request.form:
             session['n_answers'] += 1
-            return render_template('admin_dashboard_create_q.html', n_answers=session['n_answers'])
+            return render_template('admin_dashboard_create_q.html', n_answers=session['n_answers'], qtype=qtype)
         if 'remove_answer' in request.form:
             session['n_answers'] -= 1
-            return render_template('admin_dashboard_create_q.html', n_answers=session['n_answers'])
+            return render_template('admin_dashboard_create_q.html', n_answers=session['n_answers'], qtype=qtype)
         if 'cancel' in request.form:
             session.pop('n_answers')
-            return redirect(url_for('admin_dashboard', sub_page='questions'))
+            return redirect(url_for('admin_dashboard', sub_page='questions', qtype=qtype))
 
         #otherwise write question and redirect
         question_text = request.form['question_text']
@@ -61,23 +62,23 @@ def admin_dashboard_add_q():
 
         #catch form input errors
         if question_text == "":
-            return render_template('admin_dashboard_create_q.html', question_error=True, n_answers=session['n_answers'])
+            return render_template('admin_dashboard_create_q.html', question_error=True, n_answers=session['n_answers'], qtype=qtype)
         if "" in answers:
-            return render_template('admin_dashboard_create_q.html', answer_error=True, n_answers=session['n_answers'])
+            return render_template('admin_dashboard_create_q.html', answer_error=True, n_answers=session['n_answers'], qtype=qtype)
          #check unique answers
         if len(set(answers)) < len(answers):
-            return render_template('admin_dashboard_create_q.html', answer_error=True, n_answers=session['n_answers'])
+            return render_template('admin_dashboard_create_q.html', answer_error=True, n_answers=session['n_answers'], qtype=qtype)
 
         #create and save question
         new_question = models.Question(question_text, answers)
 
         session.pop('n_answers')
         questions.add_question(new_question)
-        return redirect(url_for('admin_dashboard', sub_page='questions'))
+        return redirect(url_for('admin_dashboard', sub_page='questions', qtype=qtype))
 
     #if first time form reached
     session['n_answers'] = 4
-    return render_template('admin_dashboard_create_q.html', n_answers=session['n_answers'])
+    return render_template('admin_dashboard_create_q.html', n_answers=session['n_answers'], qtype=qtype)
 
 @app.route('/dashboard/add/survey', methods=['GET', 'POST'])
 def admin_dashboard_add_s():
