@@ -1,7 +1,21 @@
 {% extends 'base_page.html' %}
 
 <!-- Page Title -->
-{% block title %}Index{% endblock %}
+{% block title %}Add Question{% endblock %}
+
+<!-- Navbar -->
+{% block nav %}
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="surveys"> Surveys </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="../../questions"> Questions</a>
+      </li>
+    </ul>
+</div>
+{% endblock%}
 
 <!-- Page Body -->
 {% block content %}
@@ -10,37 +24,24 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header bg-dark text-white">Create Question</div>
+                <nav aria-label="Question type">
+                  <ul class="pagination">
+                    <li class="page-item {% if qtype == "mcq" %}disabled{% endif %}"><a class="page-link" href="mcq">Multiple Choice</a></li>
+                    <li class="page-item {% if qtype == "textans" %}disabled{% endif %}"><a class="page-link" href="textans">Text Answer</a></li>
+                  </ul>
+                </nav>
                 <div class="card-body">
                     {% if question_error %}
                     <div class='alert alert-danger'>You need to enter a question</div>
-                    {% endif %}                    
-                    {% if answer_error %}
-                    <div class='alert alert-danger'>You either didn't enter enough answers/one or more answers is duplicate</div>
                     {% endif %}
                     <form method="POST">
-                        <div class="form-group">
-                            <label for="question_text">Question:</label>
-                            <input type="text" class="form-control" name="question_text"></input>
-                        </div>
-                        {% for i in range(n_answers) %}
-                        <div class="form-group">
-                            <label for="answer{{i}}">Answer:</label>
-                            <input type="text" class="form-control" name="answer{{i}}"></input>
-                        </div>
-                        {% endfor %}
-                        {% if n_answers < 6 %}
-                        <div class="form-group">
-                            <button type="submit" name="add_answer" class="btn btn-dark">Add Answer</button>
-                        </div>
+                        {% if qtype == "mcq" %}
+                        {% include "mcq_form.html" %}
+                        {% elif qtype == "textans" %}
+                        {% include "textans_form.html" %}
+                        {% else %}
+                        <div class='alert alert-danger'>Invalid Form Type {{qtype}}</div>
                         {% endif %}
-                        {% if n_answers > 2 %}
-                         <div class="form-group">
-                            <button type="submit" name="remove_answer" class="btn btn-dark">Remove Answer</button>
-                        </div>                       
-                        {% endif%}
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-dark">Submit</button>
-                        </div>
                         <div class="form-group">
                             <button type="submit" name="cancel" class="btn btn-danger">Cancel</button>
                         </div>
@@ -48,6 +49,6 @@
                 </div>
             </div>
         </div>
-    </div>     
+    </div>
 </div>
 {% endblock %}
