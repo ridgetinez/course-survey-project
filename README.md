@@ -1,8 +1,8 @@
 # Contributing
 
-We're going to adopt best practices for git. This pretty much means we'll be working on branches and merging them when we're done with our feature. For more information (and how to be a beast with git), read chapters 3 & 4 of [this git tutorial](https://www.learnenough.com/git-tutorial#sec-branching_and_merging).
+We're going to adopt best practices for git. This pretty much means we'll be working on branches and merging them when we're done with our feature. 
 
-We're going to the main MASTER branch, and then when you're working on - say, the SurveyController module and views - you'll branch out, and then merge back in when you've completed it.
+We're going to the main MASTER branch. When we work on a different section we'll branch out, and then merge back in when completed it.
 
 WORKFLOW
 ========
@@ -26,6 +26,7 @@ WORKFLOW
     - controller.py
     - models.py
     - readers.py
+    - tests.py
     - views.py
     - writers.py
     - static/
@@ -37,21 +38,23 @@ __run.py__ - Starts the server
 
 
 
-__\_\_init\_\_.py__ - Tells python that this directory is actually a python module
+__\_\_init\_\_.py__ - Tells server that the directory is a python module
 
-__auth.py__ - Contains class that authenticates an admin at the login screen
+__auth.py__ - Contains classes to handle the login/authentication/security for the survey app
 
 __controller.py__ - holds surveyController which contains methods to display the survey to respondents
 
-__models.py__ - Contain classes that act as data models
+__models.py__ - Uses sqlalchemy to implement database for survey objects
 
-__readers.py__ - reads data from csv files 
+__readers.py__ - Reads data from .csv files 
 
-__views.py__ - Holds all of the url/route information
+__tests.py__ - Contains test data for iteration 3
 
-__writers.py__ - write data to csv files
+__views.py__ - Contains the general workflow of the survey system including routing to different webpages
+
+__writers.py__ - Uses sqlalchemy to write into .csv files and databases
 
 
-__static/__ - Contains static files eg. images, css
+__static/__ - Contains static files (most IMPORTANTLY our .csv files!)
 
-__templates/__ - Contains Jinja2 templates
+__templates/__ - Contains Jinja2 templates (front-end application user interface)
