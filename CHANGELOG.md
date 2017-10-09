@@ -9,12 +9,24 @@
 
 ### FRONTEND DESIGN DECISIONS
 * All templates are designed to have the same theme, most notably the dark navigation bar. Gives off a professional, easy-to-use user interface feel for the admin 
-* General flow for the admin dashboard consists of the landing page (left side - login details, right side - access survey via URL) which directs to the dashboard. In the dashboard there are two main tabs (so far), one for 'create survey' and one for 'create questions'
-* Sam decided to set boundaries of the number of answers available for each question (minimum 2 radio buttons, maximum 6 radio buttons)
-* Cancel buttons where added to the 'create survey' and 'create questions' form to enhance user experience
+* General flow updated for Iteration 2
+  - Landing page (authentication page)
+  - 3 different available dashboards: 1 for admin, 1 for staff and 1 for a user
+  - Admin must close the survey using a button
+* Admin dashboard
+  - Mandatory pool and optional pool (iteration 3) of questions
+  - Add/delete questions
+  - Option to choose date to open/close survey
+  - Completed button 
+* Staff dashboard
+  - Add/delete questions
+  - Completed review button
+* User dashboard
+  - Questions and answers in multiple choice format
+  - Completed survey button
 
 
 ### TEAM OPTIMISATION DECISIONS
 * Using Slack for communication, LucidCharts for UML drawups, Google Drive for logistic documents, Github for remote git server and tons of coffee.
 * Git workflow was to branch out, commit, push changes, pull request, iterate, merge.
-* Planning for one diagram per person in the group to understand the challenges from different perspectives (different UML diagram perspectives)
+
