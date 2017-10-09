@@ -34,7 +34,7 @@ WORKFLOW
 
 ### What do these files/directories do?
 
-__run.py__ - Starts the server
+__run.py__ - Start the server
 
 
 
