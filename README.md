@@ -12,7 +12,9 @@ WORKFLOW
 3. Pushes to the remote branch.
 4. Submits a pull request to merge back into master.
 5. Team reviews and either suggests fixes or merges to master branch.
-6. Dev is happy.
+6. Coders note any changes/tasks completed in tasks logs
+7. Documenter notes these changes in all documentation (UML Diagrams, Task Logs, Charts, etc.)
+8. Dev is happy.
 
 
 ## Project Structure
@@ -20,8 +22,12 @@ WORKFLOW
  - run.py  
  - surveyapp/ 
     - \_\_init\_\_.py
+    - auth.py
+    - controller.py
     - models.py
+    - readers.py
     - views.py
+    - writers.py
     - static/
     - templates/
 
@@ -29,11 +35,22 @@ WORKFLOW
 
 __run.py__ - Starts the server
 
+
+
 __\_\_init\_\_.py__ - Tells python that this directory is actually a python module
+
+__auth.py__ - Contains class that authenticates an admin at the login screen
+
+__controller.py__ - holds surveyController which contains methods to display the survey to respondents
+
+__models.py__ - Contain classes that act as data models
+
+__readers.py__ - reads data from csv files 
 
 __views.py__ - Holds all of the url/route information
 
-__models.py__ - Contain classes that act as data models
+__writers.py__ - write data to csv files
+
 
 __static/__ - Contains static files eg. images, css
 

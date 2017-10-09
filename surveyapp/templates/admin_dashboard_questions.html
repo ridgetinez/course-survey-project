@@ -1,0 +1,55 @@
+{% extends 'base_page.html' %}
+
+<!-- Page Title -->
+{% block title %}Admin Dashboard{% endblock %}
+
+<!-- Navbar -->
+{% block nav %}
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="surveys"> Surveys </a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href=""> Questions <span class="sr-only">(current)</span></a>
+      </li>
+    </ul>
+</div>
+{% endblock%}
+
+<!-- Page Content -->
+{% block content %}
+<div class="container" style="padding-top:20px">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">Questions</div>
+                <div class="card-body">
+                    <div style="text-align:right"><a href="add/question">Add Question...</a></div>
+                    <table class="table">
+                        <tr>
+                            <th>Question ID</th>
+                            <th>Question</th>
+                            <th>Answers</th>
+                        </tr>
+                        {% for question in questions %}
+                            <tr>
+                                <td><p>{{ question.id }}</p></td>
+                                <td>{{ question.text }}</td>
+                                <td>
+                                    <ul>
+                                    {% for answer in question.answer_list %}
+                                        <li>{{ answer }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>     
+</div>
+
+{% endblock %}
