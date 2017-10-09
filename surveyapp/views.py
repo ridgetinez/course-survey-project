@@ -1,4 +1,4 @@
-from surveyapp import app, authenticator, models, readers, writers
+from surveyapp import app, models, readers, writers, auth
 from flask import render_template, session, redirect, url_for, request
 
 #TEMPORARY
@@ -12,14 +12,14 @@ surveys = []
 def index():
     """ Returns/renders the admin dashboard page (if access authorised) or the landing page (if access not authorised) """
     if request.method == 'POST':
-        #for search button
-        if 'search' in request.form:
-            return redirect(request.form['search'])
         #attempt to authenticate user using information from login form
-        auth_success = authenticator.authenticate(request.form['email'], request.form['password'])
+        auth_success = auth.AuthController.login(request.form["user-type"], request.form["id"], request.form["password"])
 
         if auth_success == True:    #if authenticated redirect to admin dashboard (user will have cookie marking as auth'd)
-            return redirect(url_for('admin_dashboard', sub_page='surveys'))
+            if request.form["user-type"] == "admin":
+                return redirect(url_for("admin_dashboard", sub_page="surveys"))
+            else:
+                return redirect(url_for("{}_dashboard".format(request.form["user-type"]), id=request.form["id"]))
         else:                       #render landing page again with notification of invalid login credentials
             return render_template('landing_page.html', failedAuth=True)
 
@@ -30,8 +30,8 @@ def admin_dashboard(sub_page):
     """ Returns/renders the survey/questions creation page or an index page (if unauthorised user access URL) """
 
     #non-authenticated user attempts access
-    if authenticator.checkAuthenticated() == False:
-        return redirect(url_for('index'))
+    if auth.UserAuthoriser.check_permission("admin", "") == False:
+        return redirect(url_for('invalid_permission'))
 
     if sub_page == 'surveys':
         return render_template('admin_dashboard_surveys.html', surveys=surveys)
@@ -41,6 +41,11 @@ def admin_dashboard(sub_page):
 
 @app.route('/dashboard/add/question', methods=['GET', 'POST'])
 def admin_dashboard_add_q():
+
+    #non-authenticated user attempts access
+    if UserAuthoriser.check_permission("admin") == False:
+        return redirect(url_for('index'))
+
     if request.method == 'POST':
         #catch these first
         if 'add_answer' in request.form:
@@ -68,11 +73,11 @@ def admin_dashboard_add_q():
         if len(set(answers)) < len(answers):
             return render_template('admin_dashboard_create_q.html', answer_error=True, n_answers=session['n_answers'])
 
-        #create and save question
+        #create and save question (This needs to be moved to another fuction)
         new_question = models.Question(question_text, answers)
 
         session.pop('n_answers')
-        questions.add_question(new_question)
+        questions.add_question(new_question) #This also needs to be moved
         return redirect(url_for('admin_dashboard', sub_page='questions'))
 
     #if first time form reached
@@ -81,6 +86,10 @@ def admin_dashboard_add_q():
 
 @app.route('/dashboard/add/survey', methods=['GET', 'POST'])
 def admin_dashboard_add_s():
+    #non-authenticated user attempts access
+    if UserAuthoriser.check_permission("admin") == False:
+        return redirect(url_for('invalid_permission'))
+
     #create course list
     course_list = []
     for course in readers.CourseReader.read(None, "surveyapp/static/courses.csv"):
@@ -119,3 +128,21 @@ def respond(course_id, survey_id):
             writer.update_row(question_id, answer_id)
         return render_template("view_survey.html", survey=survey, notif_success=True)
     return render_template("view_survey.html", survey=survey)
+
+@app.route('/studentdashboard/<id>')
+def student_dashboard(id):
+    if auth.UserAuthoriser.check_permission("student", id) == False:
+        return redirect(url_for('invalid_permission'))
+
+    return render_template("student_dashboard.html")
+
+@app.route('/staffdashboard/<id>')
+def staff_dashboard(id):
+    if auth.UserAuthoriser.check_permission("staff", id) == False:
+        return redirect(url_for('invalid_permission'))
+
+    return render_template("staff_dashboard.html")
+
+@app.route('/invalid_permission')
+def invalid_permission():
+    return render_template("invalid_permissions.html")

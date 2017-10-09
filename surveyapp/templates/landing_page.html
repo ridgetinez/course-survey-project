@@ -17,16 +17,17 @@
                     {% endif %}
                     <!-- Login form -->
                     <form method="POST">
+                        <input type="hidden" name="user-type" value="admin"/>
                         <div class="form-group">
-                            <label for="username">Username:</label>
-                            <input type="text" class="form-control" name="username" placeholder="Username"></input>
+                            <label for="id">Username:</label>
+                            <input type="text" class="form-control" name="id" placeholder="Username"></input>
                         </div>
                         <div class="form-group">
                             <label for="password">Password:</label>
                             <input type="password" class="form-control" name="password"></input>
                         </div>
                         <div class="form-group">
-                            <button type="submit" name= "admin-login" class="btn btn-dark">Login</button>
+                            <button type="submit" name= "admin" class="btn btn-dark">Login</button>
                         </div>
                     </form>
                 </div>
@@ -42,16 +43,17 @@
                     {% endif %}
                     <!-- Login form -->
                     <form method="POST">
+                        <input type="hidden" name="user-type" value="staff"/>
                         <div class="form-group">
-                            <label for="staff-id">Staff ID:</label>
-                            <input type="text" class="form-control" name="staff-id" placeholder="Staff ID"></input>
+                            <label for="id">Staff ID:</label>
+                            <input type="text" class="form-control" name="id" placeholder="Staff ID"></input>
                         </div>
                         <div class="form-group">
                             <label for="password">Password:</label>
                             <input type="password" class="form-control" name="password"></input>
                         </div>
                         <div class="form-group">
-                            <button type="submit" name="staff-login" class="btn btn-dark">Login</button>
+                            <button type="submit" name="staff" class="btn btn-dark">Login</button>
                         </div>
                     </form>
                 </div>
@@ -67,16 +69,17 @@
                     {% endif %}
                     <!-- Login form -->
                     <form method="POST">
+                        <input type="hidden" name="user-type" value="student"/>
                         <div class="form-group">
-                            <label for="zid">Zid:</label>
-                            <input type="text" class="form-control" name="zid" placeholder="zid"></input>
+                            <label for="id">Zid:</label>
+                            <input type="text" class="form-control" name="id" placeholder="zid"></input>
                         </div>
                         <div class="form-group">
                             <label for="password">Password:</label>
                             <input type="password" class="form-control" name="password"></input>
                         </div>
                         <div class="form-group">
-                            <button type="submit" name="student-login" class="btn btn-dark">Login</button>
+                            <button type="submit" name="student" class="btn btn-dark">Login</button>
                         </div>
                     </form>
                 </div>

@@ -125,6 +125,9 @@ class User(object):
     def __str__(self):
         return self.__identifier
 
+    def as_dict(self):
+        return {"type" : self.type_name(), "identifier" : self.__identifier}
+
     #checks if password matches User's password
     def check_password(self, password):
         if password == self.__password:
@@ -133,18 +136,22 @@ class User(object):
             return False
 
 class Admin(User):
-    pass
+    def type_name(self):
+        return "admin"
 
 class Staff(User):
     def __init__(self, identifier, password, classes):
-        self.__classes = classes
-        super(Staff, self).__init__(identifer, password)
+        self._classes = classes
+        super(Staff, self).__init__(identifier, password)
 
     def validate_identifier():
         if (self.__identifier.isdigit()):
             return True
         else:
             return False
+
+    def type_name(self):
+        return "staff"
 
     def get_classes(self):
         return self.__classes
@@ -152,13 +159,16 @@ class Staff(User):
 class Student(User):
     def __init__(self, identifier, password, enrolement):
         self.__enrolement = enrolement
-        super(Student, self).__init__(identifer, password)
+        super(Student, self).__init__(identifier, password)
 
     def validate_identifier():
         if (self.__identifier.isdigit()):
             return True
         else:
             return False
+
+    def type_name(self):
+        return "student"
 
     def get_enrolement(self):
         return self.__enrolement

@@ -1,0 +1,43 @@
+{% extends 'base_page.html' %}
+
+<!-- Page Title -->
+{% block title %}Staff Dashboard{% endblock %}
+
+<!-- Navbar -->
+{% block nav %}
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href=""> Surveys <span class="sr-only">(current)</span></a>
+      </li>
+    </ul>
+</div>
+{% endblock%}
+
+<!-- Page Content -->
+{% block content %}
+<div class="container" style="padding-top:20px">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">Surveys To Review</div>
+                <div class="card-body">
+                    <table class="table">
+                        <th>Course Name</th>
+                        <th>Survey</th>
+                        <th>Status</th>
+                        {% for survey in surveys %}
+                            <tr>
+                                <td>{{ survey.course }}</td>
+                                <td><a href="{{ survey.url }}">{{ survey.url }}</a></td>
+                                <td>Status</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
