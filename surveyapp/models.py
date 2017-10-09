@@ -1,188 +1,103 @@
-# Agile Development Memes for Minjie Shen's teens
-import csv
 
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.engine.url import URL
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import create_engine, inspect
+from abc import ABCMeta, abstractmethod
 
-class Question(object):
-    """ Question object to populate question pools and surveys
+Base = declarative_base()
+DATABASE_URL = 'sqlite:///survey.db'
+engine = create_engine('sqlite:///survey.db')
 
-    Args:
-    question_text -- String of the question displayed to user
-    answer_list   -- Tuple of strings representing multiple choice answers
-    """
+class TableConnector(metaclass=ABCMeta):
 
-    uqid = 0
-
-    def __init__(self, question_text, answer_list):
-        self.__question_text = question_text
-        self.__answer_list = list(set(answer_list))
-        self.__qid = Question.uqid
-        Question.uqid += 1
-
-    def __eq__(self, other):
-        return self.__question_text == other.__question_text
-
-    def __hash__(self):
-        return hash(self.__question_text)
-
-    def __str__(self):
-        return '{0} : {1}'.format(self.__question_text, self.__answer_list)
-
-    @property
-    def id(self):
-        return self.__qid
-
-    @property
-    def num_answers(self):
-        return len(self.__answer_list)
-
-    @property
-    def text(self):
-        return self.__question_text
-
-    @property
-    def answer_list(self):
-        return self.__answer_list
-
-class QuestionStore(object):
-    """ Super-class for question container classes
-
-    Args:
-    question_list -- list of questions to be stored in container
-    """
-    def __init__(self, question_list):
-        self.__question_dict = {}
-        for q in question_list:
-            if q not in self.__question_dict.values():
-                self.__question_dict[q.id] = q
-        self.__size = len(self.__question_dict)
-
-    def add_question(self, q):
-        if q in self.__question_dict.values():
-            return False
-        self.__question_dict[q.id] = q
-        self.__size += 1
-        return True
-
-    def get_question(self, qid):
+    def __init__(self): 
+        self.__base = declarative_base()
+        self.__engine = create_engine(DATABASE_URL)
         try:
-            return self.__question_dict[qid]
+            Base.metadata.create_all(bind=self.__engine)
         except:
-            return None
+            print("Tables already created! SHITS LIT.")
+        self.DBSession = sessionmaker(bind=self.__engine)
 
-    def get_all_questions(self):
-        return list(self.__question_dict.values())
+class TableLoader(TableConnector):
 
+    def __init__(self):
+        print("hhihihi")
+        super().__init__()
 
-# USE NGROK FOR FLASK
-class Survey(QuestionStore):
-    """ Surveys holds a curated set of questions with response data
+   # @abstractmethod
+    def csv_to_db(self, csv_name):
+       pass
 
-    Args:
-    question_list -- list of questions appearing in the survey
-    """
+class User(Base):
+    __tablename__ = 'USERS'
+    uid = Column(String, primary_key=True)
+    password = Column(String, nullable=False)
+    role = Column(String, nullable=False)
 
-    usid = 0
+class Course(Base):
+    __tablename__ = 'COURSES'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    session = Column(String, nullable=False)
 
-    def __init__(self, question_list, course_name):
-        super(Survey, self).__init__(question_list)
-        #self.__responses = list()
-        self.__course_name = course_name
-        self.__sid = Survey.usid
-        self.__public_url = '/survey/respond/{0}/{1}'.format(self.__course_name, self.__sid)
-        Survey.usid += 1
+class Enrolment(Base):
+    __tablename__ = 'ENROLMENTS'
+    uid = Column(Integer, ForeignKey('USERS.uid'), primary_key=True)
+    cid = Column(String, ForeignKey('COURSES.id'), primary_key=True)
+    completed = Column(String, nullable=False)
+    user = relationship('User')
+    course = relationship('Course')
 
-    @property
-    def id(self):
-        return self.__sid
+class Answer(Base):
+    __tablename__ = 'ANSWERS'
+    id = Column(Integer, primary_key=True)
+    ans_text = Column(String, unique=True)
 
-    @property
-    def url(self):
-        return self.__public_url
+class Question(Base):
+    __tablename__ = 'QUESTIONS'
+    id = Column(Integer, primary_key=True)
+    q_text = Column(String, unique=True, nullable=False)
 
-    @property
-    def course(self):
-        return self.__course_name
+class Survey(Base):
+    __tablename__ = 'SURVEYS'
+    id = Column(Integer, ForeignKey('COURSES.id'), primary_key=True)   # 1to1 relationship allows fk to also be pk
+    #endtime = Column(DateTime, nullable=False)
+    #   starttime = Column(DateTime, nullable=False)
+    course = relationship('Course')
+    state = Column(String, nullable=False)
 
+# BENEFITS OF THIS DESIGN
+# The required field is a question+survey property not affected by answers
+# abstracting this out and creating an idea to this SURVEYQStore1 will allow us to
+# simply index this table when wanting to add answers to questions (with this imp. they will already be linked to surveys)  
+class SurveyQStore(Base):
+    __tablename__ = 'SURVEYQSTORE'
+    sid = Column(Integer, ForeignKey('SURVEYS.id'), primary_key=True)
+    qid = Column(Integer, ForeignKey('QUESTIONS.id'), primary_key=True)
+    q_type = Column(String, nullable=False)     # could remove this and have aid be the NULL id when it's text based.
+    required = Column(String, nullable=False)   # optional vs. mandatory questions
+    survey = relationship('Survey')
 
-class Admin(object):
-    """ Question object to populate question pools and surveys
+class Responses(Base):
+    __tablename__ = 'RESPONSES'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    sid = Column(Integer, ForeignKey('SURVEYS.id'), primary_key=True)
+    qid = Column(Integer, ForeignKey('QUESTIONS.id'), primary_key=True)
+    response = Column(String)
+    # sqid = Column(Integer, ForeignKey('SURVEYQSTORE1.id'), primary_key=True)
+    # response = Column(String, nullable=False)
+    # new design motivated by linking response to the specific question type
+    # IF QTYPE == TEXT: LEAVE RESPONSE AS STRING
+    # ELIF QTYPE == MC: TYPECAST TO INT
+    # Also possible to just make the answertext (for MC and text) as what populates response.
 
-    Args:
-    email -- Admin's email
-    password   -- Admin's password
-    """
-
-    uaID = 0
-
-    def __init__(self, email, password):
-        self.__email = email
-        self.__password = password
-        self.__aID = Admin.uaID
-        Admin.uaID += 1
-
-    def __eq__(self, other):
-        return self.__email == other.__email
-
-    def __hash__(self):
-        return hash(self.__aID)
-
-    def __str__(self):
-        return '{0} : {1}'.format(self.__aID, self.__email)
-
-    #getter function for admin id
-    def getAdminID(self):
-        return self.__aID
-
-    #getter function for admin email
-    def getEmail(self):
-        return self.__email
-
-    #checks if password matches admin's password
-    def checkPassword(self, password):
-        if password == self.__password:
-            return True
-        else:
-            return False
-
-
-class Course(object):
-    """ Container of Survey Instances
-
-    Args:
-    course_id -- unique label for the course in form COMPXXXX
-    session   -- which year and semester the course is running
-    """
-
-    def __init__(self, course_id, session):
-        self.__course_id = course_id
-        self.__session = session
-        self.__surveys = []
-
-    def __str__(self):
-        return "{0}:{1}".format(self.__course_id, self.__session)
-
-    def add_survey(self, survey):
-        """ Appends a survey to the courses list of surveys
-
-        Args:
-        survey -- survey to be labelled under Course instance
-        """
-        return self.__surveys.append(survey) # does not check for duplicates
-
-    def get_survey(self, sid):
-        """ Return specific survey by survey id
-
-        Args:
-        sid -- unique survey integer identifier
-        """
-        for s in self.__surveys:
-            if s.id == sid:
-                return s
-
-    @property
-    def id(self):
-        return self.__course_id
-
-    @property
-    def surveys(self):
-        return self.__surveys
+class AnswerQStore(Base):
+   __tablename__ = 'ANSWERQSTORE'
+   qid = Column(Integer, ForeignKey('QUESTIONS.id'), primary_key=True)
+   aid = Column(Integer, ForeignKey('ANSWERS.id'), primary_key=True)
+   answer = relationship('Answer')
+   question = relationship('Question')
