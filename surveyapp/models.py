@@ -79,4 +79,3 @@ class Responses(Base):
 Base.metadata.create_all(bind=engine)
 ins = inspect(engine)
 for t in ins.get_table_names(): print(t)
-
