@@ -7,11 +7,10 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import create_engine, inspect
 
 Base = declarative_base()
-engine = create_engine('sqlite:///library.db')
 
 class User(Base):
     __tablename__ = 'USERS'
-    uid = Column(String, primary_key=True)
+    id = Column(String, primary_key=True)
     password = Column(String, nullable=False)
     role = Column(String, nullable=False)
 
@@ -23,7 +22,7 @@ class Course(Base):
 
 class Enrolment(Base):
     __tablename__ = 'ENROLMENTS'
-    uid = Column(Integer, ForeignKey('USERS.uid'), primary_key=True)
+    uid = Column(Integer, ForeignKey('USERS.id'), primary_key=True)
     cid = Column(String, ForeignKey('COURSES.id'), primary_key=True)
     completed = Column(String, nullable=False)
     user = relationship('User')
@@ -74,8 +73,3 @@ class Responses(Base):
     sid = Column(Integer, ForeignKey('SURVEYS.id'))
     qid = Column(Integer, ForeignKey('QUESTIONS.id'))
     response = Column(String, nullable=False)
-
-
-Base.metadata.create_all(bind=engine)
-ins = inspect(engine)
-for t in ins.get_table_names(): print(t)
