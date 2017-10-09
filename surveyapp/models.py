@@ -80,25 +80,3 @@ Base.metadata.create_all(bind=engine)
 ins = inspect(engine)
 for t in ins.get_table_names(): print(t)
 
-# DBSession = sessionmaker(bind=engine)
-# session = DBSession()
-
-# if (not session.query(User).filter(User.uid == "60").first()):
-#     new_user = User(uid="60" ,password="staff576", role="staff")
-#     session.add(new_user)
-#     session.commit()
-# users = [("60", "staff484", "student"), ("91", "student1", "student"), ("12", "eyylmao", "admin1")]
-#
-# for (uid, password, role) in users:
-#     try:
-#         user = User(uid=uid, password=password, role=role)
-#         session.add(user)
-#         session.commit()
-#     except SQLAlchemyError as e:
-#         print(e)
-#     finally:
-#         session.close()
-#
-# person = session.query(User).all()
-# for p in person:
-#     print(p.uid, p.password, p.role)
