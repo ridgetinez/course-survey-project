@@ -1,117 +1,104 @@
 
-# Agile Development Memes for Minjie Shen's teens
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.engine.url import URL
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import create_engine, inspect
+
+Base = declarative_base()
+engine = create_engine('sqlite:///library.db')
+
+class User(Base):
+    __tablename__ = 'USERS'
+    uid = Column(String, primary_key=True)
+    password = Column(String, nullable=False)
+    role = Column(String, nullable=False)
+
+class Course(Base):
+    __tablename__ = 'COURSES'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    session = Column(String, nullable=False)
+
+class Enrolment(Base):
+    __tablename__ = 'ENROLMENTS'
+    uid = Column(Integer, ForeignKey('USERS.uid'), primary_key=True)
+    cid = Column(String, ForeignKey('COURSES.id'), primary_key=True)
+    completed = Column(String, nullable=False)
+    user = relationship('User')
+    course = relationship('Course')
+
+class Answer(Base):
+    __tablename__ = 'ANSWERS'
+    id = Column(Integer, primary_key=True)
+    ans_text = Column(String, unique=True)
+
+class Question(Base):
+    __tablename__ = 'QUESTIONS'
+    id = Column(Integer, primary_key=True)
+    q_text = Column(String, unique=True, nullable=False)
+    deleted = Column(String, nullable=False)
+
+class Survey(Base):
+    __tablename__ = 'SURVEYS'
+    id = Column(Integer, ForeignKey('COURSES.id'), primary_key=True)   # 1to1 relationship allows fk to also be pk
+    endtime = Column(DateTime, nullable=False)
+    starttime = Column(DateTime, nullable=False)
+    course = relationship('Course')
+    state = Column(String, nullable=False)
 
 
 
-class Question(object):
-    """ Question object to populate question pools and surveys
-    
-    Args:
-    question_text -- String of the question displayed to user
-    answer_list   -- Tuple of strings representing multiple choice answers
-    """
-        
-    uqid = 0
-        
-    def __init__(self, question_text, answer_list):
-        self.__question_text = question_text
-        self.__answer_list = list(set(answer_list))
-        self.__num_answers = len(self.__answer_list)
-        self.__qid = Question.uqid
-        Question.uqid += 1
-    
-    def __eq__(self, other):
-        return self.__question_text == other.__question_text
-        
-    def __hash__(self):
-        return hash(self.__question_text)
-    
-    def __str__(self):
-        return '{0} : {1}'.format(self.__question_text, self.__answer_list) 
+# IN 2ND ITERATION OFDEVELOPMENT, REQUIRED FIELD ISNT NECESSARY,
+# In iter3 we may have to decouple sid|qid|required into one table
+# and then link answers to the sid|qid key
+# class SurveyQStore(Base):
+#     __tablename__ = 'SURVEYQSTORE'
+#     sid = Column(Integer, ForeignKey('SURVEYS.id'), primary_key=True)
+#     qid = Column(Integer, ForeignKey('QUESTIONS.id'), primary_key=True)
+#     required = Column(String, nullable=False)
 
-    @property
-    def id(self):
-        return self.__qid
-    
-    @property
-    def num_answers(self):
-        return self.__num_answers
-           
-    def add_answer_option(self, answer):
-        if answer in self.__answer_list:
-            return False 
-        self.__answer_list.append(answer)
-        return True
+class SurveyQStore2(Base):
+    __tablename__ = 'SURVEYQSTORE'
+    sid = Column(Integer, ForeignKey('SURVEYS.id'), primary_key=True)
+    qid = Column(Integer, ForeignKey('QUESTIONS.id'), primary_key=True)
+    aid = Column(Integer, ForeignKey('ANSWERS.id'), primary_key=True)
+    # required = Column(String, nullable=False)   # optional vs. mandatory questions
+    survey = relationship('Survey')
+    questions = relationship('Question')
+
+class Responses(Base):
+    __tablename__ = 'RESPONSES'
+    id = Column(Integer, primary_key=True)
+    sid = Column(Integer, ForeignKey('SURVEYS.id'))
+    qid = Column(Integer, ForeignKey('QUESTIONS.id'))
+    response = Column(String, nullable=False)
 
 
-class QuestionStore(object):
-    """ Super-class for question container classes
-    
-    Args:
-    question_list -- list of questions to be stored in container
-    """
-    def __init__(self, question_list):
-        self.__question_dict = {}
-        for q in question_list:
-            if q not in self.__question_dict.values():
-                self.__question_dict[q.id] = q
-        self.__size = len(self.__question_dict)     
-    
-    def add_question(self, q):
-        if q in self.__question_dict.values():
-            return False
-        self.__question_dict[q.id] = q
-        self.__size += 1
-        return True
-    
-    def get_question(self, qid):
-        try:
-            return self.__question_dict[qid]
-        except:
-            return None
-    
-    def get_all_questions(self):
-        return list(self.__question_dict.values())
+Base.metadata.create_all(bind=engine)
+ins = inspect(engine)
+for t in ins.get_table_names(): print(t)
 
+# DBSession = sessionmaker(bind=engine)
+# session = DBSession()
 
-# USE NGROK FOR FLASK
-class Survey(QuestionStore):
-    """ Surveys holds a curated set of questions with response data
-    
-    Args:
-    question_list -- list of questions appearing in the survey
-    """
-    
-    usid = 0
-    
-    def __init__(self, question_list, course_name):
-        super(Survey, self).__init__(question_list)
-        #self.__responses = list()
-        self.__course_name = course_name
-        self.__sid = Survey.usid
-        self.__public_url = '/survey/respond/{0}/{1}'.format(self.__course_name, self.__sid)
-        Survey.usid += 1
-    
-    @property
-    def id(self):
-        return self.__sid
-        
-    @property
-    def url(self):
-        return self.__public_url
-    
-    @property
-    def course(self):
-        return self.__course_name
-         
-         
-
-    
-
-        
-        
-        
-        
-        
-        
-        
+# if (not session.query(User).filter(User.uid == "60").first()):
+#     new_user = User(uid="60" ,password="staff576", role="staff")
+#     session.add(new_user)
+#     session.commit()
+# users = [("60", "staff484", "student"), ("91", "student1", "student"), ("12", "eyylmao", "admin1")]
+#
+# for (uid, password, role) in users:
+#     try:
+#         user = User(uid=uid, password=password, role=role)
+#         session.add(user)
+#         session.commit()
+#     except SQLAlchemyError as e:
+#         print(e)
+#     finally:
+#         session.close()
+#
+# person = session.query(User).all()
+# for p in person:
+#     print(p.uid, p.password, p.role)
