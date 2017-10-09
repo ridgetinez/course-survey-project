@@ -41,6 +41,11 @@ def admin_dashboard(sub_page):
 
 @app.route('/dashboard/add/question/<qtype>', methods=['GET', 'POST'])
 def admin_dashboard_add_q(qtype):
+
+    #non-authenticated user attempts access
+    if authenticator.checkAuthenticated() == False:
+        return redirect(url_for('index'))
+
     if request.method == 'POST':
         #catch these first
         print(request.form)
@@ -82,6 +87,10 @@ def admin_dashboard_add_q(qtype):
 
 @app.route('/dashboard/add/survey', methods=['GET', 'POST'])
 def admin_dashboard_add_s():
+    #non-authenticated user attempts access
+    if authenticator.checkAuthenticated() == False:
+        return redirect(url_for('index'))  
+    
     #create course list
     course_list = []
     for course in readers.CourseReader.read(None, "surveyapp/static/courses.csv"):
@@ -105,6 +114,7 @@ def admin_dashboard_add_s():
 
 @app.route('/survey/respond/<course_id>/<survey_id>', methods=['POST', 'GET'])
 def respond(course_id, survey_id):
+      
     try:
         survey = surveys[int(survey_id)]
     except IndexError: #survey doesn't exist
