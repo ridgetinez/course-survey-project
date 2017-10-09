@@ -1,3 +1,7 @@
+"""
+controller.py holds surveyController which contains methods to display the survey to respondents
+"""
+
 import models
 
 class SurveyController(object):
