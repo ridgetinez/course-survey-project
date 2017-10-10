@@ -23,14 +23,22 @@
                 <div class="card-header bg-dark text-white">Surveys To Review</div>
                 <div class="card-body">
                     <table class="table">
-                        <th>Course Name</th>
-                        <th>Survey</th>
-                        <th>Status</th>
+                        <th>Course</th>
+                        <th>Opening - Closing</th>
+                        <th></th>
                         {% for survey in surveys %}
                             <tr>
-                                <td>{{ survey.course }}</td>
-                                <td><a href="{{ survey.url }}">{{ survey.url }}</a></td>
-                                <td>Status</td>
+                                <td>{{ survey.course_name }} {{ survey.course_session}}</td>
+                                <td>{{survey.starttime}} - {{survey.endtime}}</td>
+                                <td>
+                                    {% if survey.state == 'review' %}
+                                    <form method="POST">
+                                        <div class="form-group">
+                                            <button type="submit" name="review" value='{{survey.course_name}} {{survey.course_session}}' class="btn btn-success">Review</button>
+                                        </div>
+                                    </form>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                     </table>

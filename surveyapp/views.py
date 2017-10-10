@@ -18,7 +18,7 @@ def index():
 
     return render_template('landing_page.html')
 
-@app.route('/dashboard/<sub_page>')
+@app.route('/dashboard/<sub_page>', methods=['GET', 'POST'])
 def admin_dashboard(sub_page):
     """ Returns/renders the survey/questions creation page or an index page (if unauthorised user access URL) """
 
@@ -27,15 +27,18 @@ def admin_dashboard(sub_page):
         return redirect(url_for('invalid_permission'))
 
     if sub_page == 'surveys':
-        return render_template('admin_dashboard_surveys.html', surveys=surveys)
+        return render_template('admin_dashboard_surveys.html', surveys=modelcontrollers.SurveyController.get_all_surveys())
     if sub_page == 'questions':
-        return render_template('admin_dashboard_questions.html', questions=questions.get_all_questions())
+        if request.method == 'POST':
+            if "delete" in request.form:
+                modelcontrollers.QuestionController.delete_question(request.form["delete"])
+        return render_template('admin_dashboard_questions.html', questions=modelcontrollers.QuestionController.get_all_questions())
 
 
 @app.route('/dashboard/add/question/<qtype>', methods=['GET', 'POST'])
 def admin_dashboard_add_q(qtype):
     #non-authenticated user attempts access
-    if auth.UserAuthoriser.check_permission("admin") == False:
+    if auth.UserAuthoriser.check_permission("admin", "") == False:
         return redirect(url_for('invalid_permission'))
 
     if request.method == 'POST':
@@ -77,10 +80,10 @@ def admin_dashboard_add_q(qtype):
 @app.route('/dashboard/add/survey', methods=['GET', 'POST'])
 def admin_dashboard_add_s():
     #non-authenticated user attempts access
-    if UserAuthoriser.check_permission("admin") == False:
+    if auth.UserAuthoriser.check_permission("admin", "") == False:
         return redirect(url_for('invalid_permission'))
     #create course list
-    course_list = []
+    course_list = modelcontrollers.CourseController.get_courses()
     for course in readers.CourseReader.read(None, "surveyapp/static/courses.csv"):
         course_list.append("".join(course))
 
@@ -88,18 +91,11 @@ def admin_dashboard_add_s():
         #catch cancel
         if 'cancel' in request.form:
             return redirect(url_for('admin_dashboard', sub_page='surveys'))
+        controller.FormController.parse_create_survey(request.form)
 
-        selected_questions = []
-        course_name = request.form["course_name"]
-        for i in range(len(questions.get_all_questions())):
-            if str(i) in request.form:
-                selected_questions.append(questions.get_all_questions()[i])
-        if len(selected_questions) == 0:
-            return render_template('admin_dashboard_create_survey.html', questions=questions.get_all_questions(), course_list=course_list, selection_error=True)
-        surveys.append(models.Survey(selected_questions, course_name))
         return redirect(url_for('admin_dashboard', sub_page='surveys'))
 
-    return render_template('admin_dashboard_create_survey.html', questions=questions.get_all_questions(), course_list=course_list)
+    return render_template('admin_dashboard_create_survey.html', questions=modelcontrollers.QuestionController.get_all_questions(), course_list=course_list)
 
 @app.route('/survey/respond/<course_id>/<survey_id>', methods=['POST', 'GET'])
 def respond(course_id, survey_id):
@@ -132,7 +128,7 @@ def staff_dashboard(id):
     if auth.UserAuthoriser.check_permission("staff", id) == False:
         return redirect(url_for('invalid_permission'))
 
-    return render_template("staff_dashboard.html")
+    return render_template("staff_dashboard.html", surveys=modelcontrollers.UserController.get_staff_survey(id))
 
 @app.route('/invalid_permission')
 def invalid_permission():

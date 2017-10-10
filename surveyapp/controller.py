@@ -1,11 +1,13 @@
-import surveyapp.models
 from flask import session
+from surveyapp import modelcontrollers
+from datetime import date
+"""
 class SurveyController(object):
-    """ Handles the respondent answering a survey
+     Handles the respondent answering a survey
 
     Args:
     survey -- the designated survey to serve to respondent
-    """
+
 
     def __init__(self, survey):
         self.__survey = survey
@@ -19,7 +21,7 @@ class SurveyController(object):
         # GET QUESTION AND THEN
         self.__response[qid] = ans_index
 
-
+"""
 class FormController(object):
     def parse_create_q(request):
         answers = []
@@ -35,6 +37,15 @@ class FormController(object):
         if "" in answers:
             return [False, 'aerror']
 
-        print({request['question_text'] : answers})
-        #this is where you should call create question
+        print([request['question_text'], answers])
+        modelcontrollers.QuestionController.write_question([request['question_text'], answers])
         return [True]
+
+    def parse_create_survey(request):
+        selected_questions = []
+        course = request['course_name'].split(" ")
+        questions = []
+        for item in request:
+            if item != 'course_name':
+                questions.append(item)
+        modelcontrollers.SurveyController.write_survey(course[0], course[1], date(2020, 1, 1), questions)

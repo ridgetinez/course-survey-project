@@ -28,22 +28,35 @@
                     <div style="text-align:right"><a href="add/question/mcq">Add Question...</a></div>
                     <table class="table">
                         <tr>
-                            <th>Question ID</th>
+                            <th>ID</th>
                             <th>Question</th>
                             <th>Answers</th>
+                            <th></th>
                         </tr>
                         {% for question in questions %}
-                            <tr>
-                                <td><p>{{ question.id }}</p></td>
-                                <td>{{ question.text }}</td>
-                                <td>
-                                    <ul>
-                                    {% for answer in question.answer_list %}
-                                        <li>{{ answer }}</li>
-                                    {% endfor %}
-                                    </ul>
-                                </td>
-                            </tr>
+                            {% if question[3] != "True"%}
+                                <tr>
+                                    <td>{{question[0]}}</td>
+                                    <td>{{ question[1] }}</td>
+                                    <td>
+                                        <ul>
+                                        {% for answer in question[2] %}
+                                                <li>{{ answer }}</li>
+                                        {% endfor %}
+                                        {% if question[2] | length == 0 %}
+                                            <p>N/A</p>
+                                        {% endif %}
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <form method="POST">
+                                            <div class="form-group">
+                                                <button type="submit" name="delete" value='{{question[0]}}' class="btn btn-danger">Delete</button>
+                                            </div>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endif %}
                         {% endfor %}
                     </table>
                 </div>

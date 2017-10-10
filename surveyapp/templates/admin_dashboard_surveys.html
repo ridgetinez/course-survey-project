@@ -28,20 +28,20 @@
                     <div style="text-align:right"><a href="add/survey">Add Survey...</a></div>
                     <table class="table">
                         <th>Course Name</th>
-                        <th>Survey ID</th>
-                        <th>Public URL</th>
+                        <th>Time</th>
+                        <th>Status</th>
                         {% for survey in surveys %}
                             <tr>
-                                <td>{{ survey.course }}</td>
-                                <td>{{ survey.id }}</td>
-                                <td>{{ survey.url }}</td>
+                                <td>{{ survey.course_name }} {{ survey.course_session}}</td>
+                                <td> {{survey.starttime}} - {{ survey.endtime }}</td>
+                                <td>{{ survey.state }}</td>
                             </tr>
                         {% endfor %}
-                    </table> 
+                    </table>
                 </div>
             </div>
         </div>
-    </div>     
+    </div>
 </div>
 
 {% endblock %}

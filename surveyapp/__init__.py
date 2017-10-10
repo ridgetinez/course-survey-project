@@ -5,15 +5,18 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 engine = create_engine('sqlite:///library.db')
 
-try:
-    Base.metadata.create_all(engine)
-except:
-    print('Table already there.')
+from surveyapp import models
+
+#try:
+Base.metadata.create_all(engine)
+#except:
+    #print('Table already there.')
 
 from surveyapp import modelcontrollers
 
 modelcontrollers.CSVloader.get_users_csv()
-
+modelcontrollers.CSVloader.get_course_csv()
+modelcontrollers.CSVloader.get_enrolement_csv()
 
 app = Flask(__name__)
 

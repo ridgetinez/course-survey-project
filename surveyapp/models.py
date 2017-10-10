@@ -1,7 +1,6 @@
 
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, ForeignKeyConstraint
 from sqlalchemy.orm import relationship
-from sqlalchemy import create_engine, inspect
 from surveyapp import Base
 
 class User(Base):
@@ -12,17 +11,20 @@ class User(Base):
 
 class Course(Base):
     __tablename__ = 'COURSES'
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    session = Column(String, nullable=False)
+    name = Column(String, primary_key=True)
+    session = Column(String, primary_key=True)
 
 class Enrolment(Base):
     __tablename__ = 'ENROLMENTS'
     uid = Column(Integer, ForeignKey('USERS.uid'), primary_key=True)
-    cid = Column(String, ForeignKey('COURSES.id'), primary_key=True)
     completed = Column(String, nullable=False)
+    course_name = Column(String, nullable=False, primary_key=True)
+    course_session = Column(String, nullable=False, primary_key=True)
     user = relationship('User')
     course = relationship('Course')
+    __table_args__ = (ForeignKeyConstraint([course_name, course_session],
+                                           [Course.name, Course.session]),
+                                           {})
 
 class Question(Base):
     __tablename__ = 'QUESTIONS'
@@ -33,11 +35,15 @@ class Question(Base):
 
 class Survey(Base):
     __tablename__ = 'SURVEYS'
-    id = Column(Integer, ForeignKey('COURSES.id'), primary_key=True)   # 1to1 relationship allows fk to also be pk
+    course_name = Column(String, nullable=False, primary_key=True)
+    course_session = Column(String, nullable=False, primary_key=True)
     endtime = Column(DateTime, nullable=False)
     starttime = Column(DateTime, nullable=False)
     course = relationship('Course')
     state = Column(String, nullable=False)
+    __table_args__ = (ForeignKeyConstraint([course_name, course_session],
+                                           [Course.name, Course.session]),
+                                           {})
 
 
 
@@ -52,14 +58,20 @@ class Survey(Base):
 
 class SurveyQStore(Base):
     __tablename__ = 'SURVEYQSTORE'
-    id = Column(Integer, primary_key=True)
-    sid = Column(Integer, ForeignKey('SURVEYS.id'), primary_key=True)
+    course_name = Column(String, nullable=False, primary_key=True)
+    course_session = Column(String, nullable=False, primary_key=True)
     qid = Column(Integer, ForeignKey('QUESTIONS.id'), primary_key=True)
-    #required = Column(String, nullable=False)
+    __table_args__ = (ForeignKeyConstraint([course_name, course_session],
+                                           [Survey.course_name, Survey.course_session]),
+                                           {})
 
 class Responses(Base):
     __tablename__ = 'RESPONSES'
     id = Column(Integer, primary_key=True)
-    sid = Column(Integer, ForeignKey('SURVEYS.id'))
+    course_name = Column(String, nullable=False, primary_key=True)
+    course_session = Column(String, nullable=False, primary_key=True)
     qid = Column(Integer, ForeignKey('QUESTIONS.id'))
     response = Column(String, nullable=False)
+    __table_args__ = (ForeignKeyConstraint([course_name, course_session],
+                                           [Survey.course_name, Survey.course_session]),
+                                           {})
