@@ -68,8 +68,8 @@ class SurveyQStore(Base):
 class Responses(Base):
     __tablename__ = 'RESPONSES'
     id = Column(Integer, primary_key=True)
-    course_name = Column(String, nullable=False, primary_key=True)
-    course_session = Column(String, nullable=False, primary_key=True)
+    course_name = Column(String, nullable=False)
+    course_session = Column(String, nullable=False)
     qid = Column(Integer, ForeignKey('QUESTIONS.id'))
     response = Column(String, nullable=False)
     __table_args__ = (ForeignKeyConstraint([course_name, course_session],

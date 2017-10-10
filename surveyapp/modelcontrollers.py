@@ -3,7 +3,7 @@ from ast import literal_eval
 import csv
 from surveyapp import models, engine
 from sqlalchemy.orm import sessionmaker
-from datetime import date
+from datetime import datetime
 
 class CSVloader():
     def get_users_csv():
@@ -41,6 +41,7 @@ class CourseController():
         DBSession = sessionmaker(bind=engine)
         session = DBSession()
 
+        session.close()
         return session.query(models.Course).all()
 
 class EnrolmentController():
@@ -60,7 +61,7 @@ class EnrolmentController():
         DBSession = sessionmaker(bind=engine)
         session = DBSession()
 
-        courses = session.query(models.Enrolment).filter(models.Enrolment.uid == user_id).all()
+        courses = session.query(models.Enrolment).filter(models.Enrolment.uid == user_id).filter(models.Enrolment.completed != 'True').all()
         session.close()
         return courses
 
@@ -81,17 +82,32 @@ class UserController():
         session = DBSession()
 
         user = session.query(models.User).filter(models.User.uid == user_name).first()
+
+        session.close()
         if user.password == password:
             return True
         else:
             return False
 
-    def get_staff_survey(user_id):
+    def get_user_survey(user_id):
         enrolments = EnrolmentController.get_enrolment(user_id)
+        for enrolment in enrolments:
+            print(enrolment.course_name + " " + enrolment.course_session)
         surveys = []
         for enrolment in enrolments:
             surveys.append(SurveyController.get_survey(enrolment.course_name, enrolment.course_session))
+
         return surveys
+
+    def set_survey_completed(course_name, course_session, user_id):
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()
+
+        enrolment = session.query(models.Enrolment).filter(models.Enrolment.uid == user_id).filter(models.Enrolment.course_name == course_name).filter(models.Enrolment.course_session == course_session).first()
+
+        enrolment.completed = 'True'
+        session.commit()
+        session.close()
 
 class QuestionController():
     def write_question(question_rep): # question_rep = [question_text, [answers]]
@@ -113,7 +129,8 @@ class QuestionController():
 
         question = session.query(models.Question).filter(models.Question.id == id).first()
 
-        return [question.id, question.question_text, QuestionController.reformat_ans(question.ans), question.deleted]
+        session.close()
+        return [question.id, question.question, QuestionController.reformat_ans(question.ans), question.deleted]
 
     def get_all_questions():
         DBSession = sessionmaker(bind=engine)
@@ -123,11 +140,12 @@ class QuestionController():
         question_list = []
         for question in questions:
             question_list.append([question.id, question.question, QuestionController.reformat_ans(question.ans), question.deleted])
+
+        session.close()
         return question_list
 
     def reformat_ans(answer):
         if answer == "":
-            print('text answer')
             return []
         answers = answer.split('|')
         return answers
@@ -142,23 +160,35 @@ class QuestionController():
         session.close()
 
 class SurveyController():
-    def write_survey(course_name, course_session, endtime, questions):
+    def write_survey(course_name, course_session, starttime, endtime, questions):
         DBSession = sessionmaker(bind=engine)
         session = DBSession()
-
-        new_survey = models.Survey(course_name=course_name, course_session=course_session, starttime=date.today(), endtime=endtime, state='review')
+        state='created'
+        if starttime < datetime.now():
+            state='review'
+        new_survey = models.Survey(course_name=course_name, course_session=course_session, starttime=starttime, endtime=endtime, state=state)
         session.add(new_survey)
         for qid in questions:
             new_question = models.SurveyQStore(course_name=course_name, course_session=course_session, qid=qid)
             session.add(new_question)
-        session.commit()
+        try:
+            session.commit()
+        except:
+            return False
         session.close()
+        return True
 
     def get_survey(course_name, course_session):
         DBSession = sessionmaker(bind=engine)
         session = DBSession()
 
-        survey = session.query(models.Survey).filter(models.Course.name == course_name).filter(models.Course.session == course_session).first()
+        survey = session.query(models.Survey).filter(models.Survey.course_name == course_name).filter(models.Survey.course_session == course_session).first()
+        session.close()
+        try:
+            SurveyController.set_deactivate_after_end(survey)
+            SurveyController.set_review_after_start(survey)
+        except AttributeError:
+            print("no survey for {} {}".format(course_name, course_session))
 
         return survey
 
@@ -166,6 +196,80 @@ class SurveyController():
         DBSession = sessionmaker(bind=engine)
         session = DBSession()
 
-        survey = session.query(models.Survey).all()
+        surveys = session.query(models.Survey).all()
+        session.close()
+        for survey in surveys:
+            SurveyController.set_deactivate_after_end(survey)
+            SurveyController.set_review_after_start(survey)
+        return surveys
 
-        return survey
+    def get_survey_questions(course_name, course_session):
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()
+
+        q_stores = session.query(models.SurveyQStore).filter(models.SurveyQStore.course_name == course_name).filter(models.SurveyQStore.course_session == course_session).all()
+
+        questions = []
+        for q in q_stores:
+            questions.append(QuestionController.get_question(q.qid))
+
+        session.close()
+        return questions
+
+    def set_survey_active(course_name, course_session):
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()
+
+        survey = session.query(models.Survey).filter(models.Survey.course_name == course_name).filter(models.Survey.course_session == course_session).first()
+
+        survey.state = 'active'
+        session.commit()
+        session.close()
+
+    def set_deactivate_after_end(survey):
+        if survey.endtime < datetime.now():
+            print(survey.course_name + " " + survey.course_session)
+            DBSession = sessionmaker(bind=engine)
+            session = DBSession()
+
+            sur = session.query(models.Survey).filter(models.Survey.course_name == survey.course_name).filter(models.Survey.course_session == survey.course_session).first()
+
+            if sur.state != 'closed':
+                sur.state = 'deactivate'
+            session.commit()
+            session.close()
+
+    def set_review_after_start(survey):
+        if survey.starttime < datetime.now():
+            print(survey.course_name + " " + survey.course_session)
+            DBSession = sessionmaker(bind=engine)
+            session = DBSession()
+
+            sur = session.query(models.Survey).filter(models.Survey.course_name == survey.course_name).filter(models.Survey.course_session == survey.course_session).first()
+
+            if sur.state == 'created':
+                sur.state = 'review'
+            session.commit()
+            session.close()
+    def close_survey(course_name, course_session):
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()
+
+        survey = session.query(models.Survey).filter(models.Survey.course_name == course_name).filter(models.Survey.course_session == course_session).first()
+
+        if survey.endtime < datetime.now():
+            survey.state = 'closed'
+
+        session.commit()
+        session.close
+
+class ResponsesController():
+    def write_response(course_name, course_session, qid, response):
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()
+
+        response = models.Responses(course_name=course_name, course_session=course_session, qid=qid, response=response)
+
+        session.add(response)
+        session.commit()
+        session.close()

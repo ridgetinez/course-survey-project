@@ -7,10 +7,10 @@ engine = create_engine('sqlite:///library.db')
 
 from surveyapp import models
 
-#try:
-Base.metadata.create_all(engine)
-#except:
-    #print('Table already there.')
+try:
+    Base.metadata.create_all(engine)
+except:
+    print('Table already there.')
 
 from surveyapp import modelcontrollers
 

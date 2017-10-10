@@ -15,6 +15,11 @@
       </li>
     </ul>
 </div>
+<ul class="navbar-nav mr-auto float-right">
+    <li class="nav-item">
+      <a class="nav-link" href="/logout"> Logout</a>
+    </li>
+</ul>
 {% endblock%}
 
 <!-- Page Content -->
@@ -34,7 +39,23 @@
                             <tr>
                                 <td>{{ survey.course_name }} {{ survey.course_session}}</td>
                                 <td> {{survey.starttime}} - {{ survey.endtime }}</td>
-                                <td>{{ survey.state }}</td>
+                                <td>
+                                    {% if survey.state == 'created' %}
+                                        <button type="button" class="btn" disabled>Created</button>
+                                    {% elif survey.state == 'review' %}
+                                        <button type="button" class="btn" disabled>Awaiting Review</button>
+                                    {% elif survey.state == 'active' %}
+                                        <button type="button" class="btn" disabled>Survey Active</button>
+                                    {% elif survey.state == 'closed' %}
+                                        <button type="button" class="btn" disabled>Closed</button>
+                                    {% elif survey.state == 'deactivate' %}
+                                        <form method='POST'>
+                                            <div class="form-group">
+                                                <button type="submit" name="close" value='{{survey.course_name}} {{ survey.course_session}}' class="btn btn-danger">Close</button>
+                                            </div>
+                                        </form>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                     </table>

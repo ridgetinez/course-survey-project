@@ -1,6 +1,6 @@
 from flask import session
 from surveyapp import modelcontrollers
-from datetime import date
+from datetime import datetime
 """
 class SurveyController(object):
      Handles the respondent answering a survey
@@ -37,15 +37,35 @@ class FormController(object):
         if "" in answers:
             return [False, 'aerror']
 
-        print([request['question_text'], answers])
         modelcontrollers.QuestionController.write_question([request['question_text'], answers])
         return [True]
 
     def parse_create_survey(request):
-        selected_questions = []
+        try:
+            start_time = datetime.strptime(request['start-time'], "%Y-%m-%dT%H:%M")
+            end_time = datetime.strptime(request['end-time'], "%Y-%m-%dT%H:%M")
+        except ValueError:
+            return [False, 'verror']
+
+        if start_time > end_time:
+            return [False, 'terror']
         course = request['course_name'].split(" ")
         questions = []
         for item in request:
-            if item != 'course_name':
+            if (item != 'course_name') and (item != 'start-time') and (item != 'end-time'):
                 questions.append(item)
-        modelcontrollers.SurveyController.write_survey(course[0], course[1], date(2020, 1, 1), questions)
+        if len(questions) == 0:
+            print('NO QUESTIONS')
+            return [False, 'qerror']
+        print(len(questions))
+        print(questions)
+        if modelcontrollers.SurveyController.write_survey(course[0], course[1], start_time, end_time, questions) == False:
+            return [False, 'rerror']
+        return [True]
+
+    def parse_response(request, user_id):
+        survey_list = request['course'].split(" ")
+        for item in request:
+            if item != 'course':
+                modelcontrollers.ResponsesController.write_response(survey_list[0], survey_list[1], item, request[item])
+        modelcontrollers.UserController.set_survey_completed(survey_list[0], survey_list[1], user_id)

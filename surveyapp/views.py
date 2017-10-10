@@ -27,6 +27,10 @@ def admin_dashboard(sub_page):
         return redirect(url_for('invalid_permission'))
 
     if sub_page == 'surveys':
+        if request.method == 'POST':
+            if "close" in request.form:
+                survey_list = request.form['close'].split(" ")
+                modelcontrollers.SurveyController.close_survey(survey_list[0], survey_list[1])
         return render_template('admin_dashboard_surveys.html', surveys=modelcontrollers.SurveyController.get_all_surveys())
     if sub_page == 'questions':
         if request.method == 'POST':
@@ -82,54 +86,87 @@ def admin_dashboard_add_s():
     #non-authenticated user attempts access
     if auth.UserAuthoriser.check_permission("admin", "") == False:
         return redirect(url_for('invalid_permission'))
-    #create course list
-    course_list = modelcontrollers.CourseController.get_courses()
-    for course in readers.CourseReader.read(None, "surveyapp/static/courses.csv"):
-        course_list.append("".join(course))
 
     if request.method == 'POST':
         #catch cancel
         if 'cancel' in request.form:
             return redirect(url_for('admin_dashboard', sub_page='surveys'))
-        controller.FormController.parse_create_survey(request.form)
+        result = controller.FormController.parse_create_survey(request.form)
+
+        if result[0] == False:
+            if result[1] == 'qerror':
+                return render_template('admin_dashboard_create_survey.html', questions=modelcontrollers.QuestionController.get_all_questions(), course_list=modelcontrollers.CourseController.get_courses(), selection_error=True)
+            if result[1] == 'terror':
+                return render_template('admin_dashboard_create_survey.html', questions=modelcontrollers.QuestionController.get_all_questions(), course_list=modelcontrollers.CourseController.get_courses(), time_error=True)
+            if result[1] == 'verror':
+                return render_template('admin_dashboard_create_survey.html', questions=modelcontrollers.QuestionController.get_all_questions(), course_list=modelcontrollers.CourseController.get_courses(), value_error=True)
+            if result[1] == 'rerror':
+                return render_template('admin_dashboard_create_survey.html', questions=modelcontrollers.QuestionController.get_all_questions(), course_list=modelcontrollers.CourseController.get_courses(), redo_error=True)
+
 
         return redirect(url_for('admin_dashboard', sub_page='surveys'))
 
-    return render_template('admin_dashboard_create_survey.html', questions=modelcontrollers.QuestionController.get_all_questions(), course_list=course_list)
+    return render_template('admin_dashboard_create_survey.html', questions=modelcontrollers.QuestionController.get_all_questions(), course_list=modelcontrollers.CourseController.get_courses())
 
-@app.route('/survey/respond/<course_id>/<survey_id>', methods=['POST', 'GET'])
-def respond(course_id, survey_id):
+@app.route('/survey/respond/<id>', methods=['POST', 'GET'])
+def respond(id):
+    if auth.UserAuthoriser.check_permission("student", id) == False:
+        return redirect(url_for('invalid_permission'))
 
-    try:
-        survey = surveys[int(survey_id)]
-    except IndexError: #survey doesn't exist
-        return '<h1>Error Survey Doesn\'t exist</h1>'
+    if request.method == "POST":
+        print(request.form)
+        controller.FormController.parse_response(request.form, id)
+        return redirect(url_for('student_dashboard', id=id))
+    survey_list = session.pop('survey_to_complete').split(" ")
+    return render_template("view_survey.html", survey=modelcontrollers.SurveyController.get_survey(survey_list[0], survey_list[1]), questions=modelcontrollers.SurveyController.get_survey_questions(survey_list[0], survey_list[1]))
 
-    if request.method == 'POST':
-        #check all answered
-        if len(request.form) < len(survey.get_all_questions()):
-            return render_template("view_survey.html", survey=survey, error_not_answered=True)
-        writer = writers.ResponseWriter(survey)
-        print(request.form.items())
-        for question_id, answer_id in request.form.items():
-            writer.update_row(question_id, answer_id)
-        return render_template("view_survey.html", survey=survey, notif_success=True)
-    return render_template("view_survey.html", survey=survey)
-
-@app.route('/studentdashboard/<id>')
+@app.route('/studentdashboard/<id>', methods=['GET','POST'])
 def student_dashboard(id):
     if auth.UserAuthoriser.check_permission("student", id) == False:
         return redirect(url_for('invalid_permission'))
 
-    return render_template("student_dashboard.html")
+    if request.method == 'POST':
+        session['survey_to_complete'] = request.form['respond']
+        return redirect(url_for('respond', id=id))
+    return render_template("student_dashboard.html", surveys=modelcontrollers.UserController.get_user_survey(id))
 
-@app.route('/staffdashboard/<id>')
+@app.route('/staffdashboard/<id>', methods=['GET', 'POST'])
 def staff_dashboard(id):
     if auth.UserAuthoriser.check_permission("staff", id) == False:
         return redirect(url_for('invalid_permission'))
 
-    return render_template("staff_dashboard.html", surveys=modelcontrollers.UserController.get_staff_survey(id))
+    if request.method == 'POST':
+        session['survey_to_review'] = request.form['review']
+        return redirect(url_for('review_survey', id=id))
+    return render_template("staff_dashboard.html", surveys=modelcontrollers.UserController.get_user_survey(id))
+
+@app.route('/staffdashboard/<id>/review', methods=['GET', 'POST'])
+def review_survey(id):
+    if auth.UserAuthoriser.check_permission("staff", id) == False:
+        return redirect(url_for('invalid_permission'))
+
+    if request.method == 'POST':
+        if 'accept' in request.form:
+            survey_as_list = request.form['accept'].split(" ")
+            modelcontrollers.SurveyController.set_survey_active(survey_as_list[0], survey_as_list[1])
+
+            return redirect(url_for('staff_dashboard', id=id))
+
+    try:
+        survey = session.pop('survey_to_review')
+    except KeyError:
+        return redirect(url_for('invalid_permission'))
+    survey_as_list = survey.split(" ");
+    return render_template("review_survey.html", survey=modelcontrollers.SurveyController.get_survey(survey_as_list[0], survey_as_list[1]), questions=modelcontrollers.SurveyController.get_survey_questions(survey_as_list[0], survey_as_list[1]))
 
 @app.route('/invalid_permission')
 def invalid_permission():
     return render_template("invalid_permissions.html")
+
+@app.route('/logout')
+def logout():
+    try:
+        session.pop("user")
+    except:
+        pass
+    return redirect(url_for("index"))

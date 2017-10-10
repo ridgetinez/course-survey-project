@@ -12,6 +12,11 @@
       </li>
     </ul>
 </div>
+<ul class="navbar-nav mr-auto float-right">
+    <li class="nav-item">
+      <a class="nav-link" href="/logout"> Logout</a>
+    </li>
+</ul>
 {% endblock%}
 
 <!-- Page Content -->
@@ -24,14 +29,22 @@
                 <div class="card-body">
                     <table class="table">
                         <th>Course Name</th>
-                        <th>Survey</th>
-                        <th>Time Remaining</th>
+                        <th>Start Time - End Time</th>
+                        <th></th>
                         {% for survey in surveys %}
-                            <tr>
-                                <td>{{ survey.course }}</td>
-                                <td><a href="{{ survey.url }}">{{ survey.url }}</a></td>
-                                <td>Time</td>
-                            </tr>
+                            {% if survey.state == 'active' %}
+                                <tr>
+                                    <td>{{ survey.course_name }} {{ survey.course_session }}</td>
+                                    <td>{{ survey.starttime }} - {{ survey.endtime }}</td>
+                                    <td>
+                                        <form method="POST">
+                                            <div class="form-group">
+                                                <button type="submit" name="respond" value='{{survey.course_name}} {{survey.course_session}}' class="btn btn-success">Respond</button>
+                                            </div>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endif %}
                         {% endfor %}
                     </table>
                 </div>

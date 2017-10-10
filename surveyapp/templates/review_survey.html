@@ -1,0 +1,41 @@
+{% extends 'base_page.html' %}
+
+<!-- Page Title -->
+{% block title %}{{ survey.course_name }} {{ survey.course_session }}{% endblock %}
+
+<!-- Page Body -->
+{% block content %}
+<div class="container" style="padding-top:20px">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">{{ survey.course_name }} {{ survey.course_session }}</div>
+                <div class="card-body">
+                    <table class="table">
+                        {% for question in questions %}
+                            <tr>
+                                <td>
+                                <p>{{question[1]}}</p>
+                                <ul>
+                                    {% for answer in question[2] %}
+                                        <li>{{ answer }}</li>
+                                    {% endfor %}
+                                </ul>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    <form method="POST">
+                        <div class="form-group">
+                            <button type="submit" name="accept"  value='{{ survey.course_name }} {{ survey.course_session }}'class="btn btn-success">Accept</button>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" name="cancel" class="btn btn-danger">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
