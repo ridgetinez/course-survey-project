@@ -1,5 +1,19 @@
 from flask import Flask
-from surveyapp.models import Admin
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
+engine = create_engine('sqlite:///library.db')
+
+try:
+    Base.metadata.create_all(engine)
+except:
+    print('Table already there.')
+
+from surveyapp import modelcontrollers
+
+modelcontrollers.CSVloader.get_users_csv()
+
 
 app = Flask(__name__)
 

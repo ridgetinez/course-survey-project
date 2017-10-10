@@ -1,13 +1,8 @@
 
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
-from sqlalchemy.engine.url import URL
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine, inspect
-
-Base = declarative_base()
-engine = create_engine('sqlite:///library.db')
+from surveyapp import Base
 
 class User(Base):
     __tablename__ = 'USERS'
@@ -29,15 +24,11 @@ class Enrolment(Base):
     user = relationship('User')
     course = relationship('Course')
 
-class Answer(Base):
-    __tablename__ = 'ANSWERS'
-    id = Column(Integer, primary_key=True)
-    ans_text = Column(String, unique=True)
-
 class Question(Base):
     __tablename__ = 'QUESTIONS'
     id = Column(Integer, primary_key=True)
-    q_text = Column(String, unique=True, nullable=False)
+    question = Column(String, unique=True, nullable=False)
+    ans = Column(String, nullable=False)
     deleted = Column(String, nullable=False)
 
 class Survey(Base):
@@ -59,14 +50,12 @@ class Survey(Base):
 #     qid = Column(Integer, ForeignKey('QUESTIONS.id'), primary_key=True)
 #     required = Column(String, nullable=False)
 
-class SurveyQStore2(Base):
+class SurveyQStore(Base):
     __tablename__ = 'SURVEYQSTORE'
+    id = Column(Integer, primary_key=True)
     sid = Column(Integer, ForeignKey('SURVEYS.id'), primary_key=True)
     qid = Column(Integer, ForeignKey('QUESTIONS.id'), primary_key=True)
-    aid = Column(Integer, ForeignKey('ANSWERS.id'), primary_key=True)
-    # required = Column(String, nullable=False)   # optional vs. mandatory questions
-    survey = relationship('Survey')
-    questions = relationship('Question')
+    #required = Column(String, nullable=False)
 
 class Responses(Base):
     __tablename__ = 'RESPONSES'
@@ -74,8 +63,3 @@ class Responses(Base):
     sid = Column(Integer, ForeignKey('SURVEYS.id'))
     qid = Column(Integer, ForeignKey('QUESTIONS.id'))
     response = Column(String, nullable=False)
-
-
-Base.metadata.create_all(bind=engine)
-ins = inspect(engine)
-for t in ins.get_table_names(): print(t)

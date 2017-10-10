@@ -1,12 +1,5 @@
-from surveyapp import app, models, readers, writers, auth
+from surveyapp import app, readers, modelcontrollers, auth, controller
 from flask import render_template, session, redirect, url_for, request
-
-#TEMPORARY
-global questions
-questions = models.QuestionStore([])
-global surveys
-surveys = []
-#TEMPORARY
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -42,7 +35,7 @@ def admin_dashboard(sub_page):
 @app.route('/dashboard/add/question/<qtype>', methods=['GET', 'POST'])
 def admin_dashboard_add_q(qtype):
     #non-authenticated user attempts access
-    if UserAuthoriser.check_permission("admin") == False:
+    if auth.UserAuthoriser.check_permission("admin") == False:
         return redirect(url_for('invalid_permission'))
 
     if request.method == 'POST':
@@ -59,29 +52,26 @@ def admin_dashboard_add_q(qtype):
             return redirect(url_for('admin_dashboard', sub_page='questions', qtype=qtype))
 
         #otherwise write question and redirect
-        question_text = request.form['question_text']
-        answers = []
-        for i in range(session['n_answers']):
-            answers.append(request.form['answer' + str(i)])
+        result = controller.FormController.parse_create_q(request.form)
 
         #catch form input errors
-        if question_text == "":
-            return render_template('admin_dashboard_create_q.html', question_error=True, n_answers=session['n_answers'], qtype=qtype)
-        if "" in answers:
-            return render_template('admin_dashboard_create_q.html', answer_error=True, n_answers=session['n_answers'], qtype=qtype)
-         #check unique answers
-        if len(set(answers)) < len(answers):
-            return render_template('admin_dashboard_create_q.html', answer_error=True, n_answers=session['n_answers'], qtype=qtype)
+        if result[0] == False:
+            if result[1] == 'qerror':
+                return render_template('admin_dashboard_create_q.html', question_error=True, n_answers=session['n_answers'], qtype=qtype)
+            elif result[1] == 'aerror':
+                return render_template('admin_dashboard_create_q.html', answer_error=True, n_answers=session['n_answers'], qtype=qtype)
+            else:
+                print('error: unexpected error thrown when parsing add_q form')
 
-        #create and save question (This needs to be moved to another fuction)
-        new_question = models.Question(question_text, answers)
 
         session.pop('n_answers')
-        questions.add_question(new_question)
         return redirect(url_for('admin_dashboard', sub_page='questions', qtype=qtype))
 
     #if first time form reached
-    session['n_answers'] = 4
+    if qtype == 'mcq':
+        session['n_answers'] = 4
+    if qtype == 'textans':
+        session['n_answers'] = 0
     return render_template('admin_dashboard_create_q.html', n_answers=session['n_answers'], qtype=qtype)
 
 @app.route('/dashboard/add/survey', methods=['GET', 'POST'])
@@ -98,6 +88,7 @@ def admin_dashboard_add_s():
         #catch cancel
         if 'cancel' in request.form:
             return redirect(url_for('admin_dashboard', sub_page='surveys'))
+
         selected_questions = []
         course_name = request.form["course_name"]
         for i in range(len(questions.get_all_questions())):
@@ -112,7 +103,7 @@ def admin_dashboard_add_s():
 
 @app.route('/survey/respond/<course_id>/<survey_id>', methods=['POST', 'GET'])
 def respond(course_id, survey_id):
-      
+
     try:
         survey = surveys[int(survey_id)]
     except IndexError: #survey doesn't exist
