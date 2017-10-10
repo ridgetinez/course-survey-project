@@ -62,23 +62,25 @@
                         <div class="form-group">
                             <table class="table">
                             {% for question in questions %}
-                            <tr>
-                                <td>
-                                    <div class="form-check">
-                                        <label class="form-check-label">
-                                            <input class="form-check-input" type="checkbox" name="{{question[0]}}">
-                                        </label>
-                                    </div>
-                                </td>
-                                <td>
-                                    <p>{{question[1]}}</p>
-                                    <ul>
-                                        {% for answer in question[2] %}
-                                            <li>{{ answer }}</li>
-                                        {% endfor%}
-                                    </ul>
-                                </td>
-                            </tr>
+                            {% if question[3] != 'True' %}
+                                <tr>
+                                    <td>
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input class="form-check-input" type="checkbox" name="{{question[0]}}">
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p>{{question[1]}}</p>
+                                        <ul>
+                                            {% for answer in question[2] %}
+                                                <li>{{ answer }}</li>
+                                            {% endfor%}
+                                        </ul>
+                                    </td>
+                                </tr>
+                            {% endif %}
                             {% endfor %}
                             </table>
                         </div>

@@ -48,7 +48,7 @@
                                         <button type="button" class="btn" disabled>Survey Active</button>
                                     {% elif survey.state == 'closed' %}
                                         <button type="button" class="btn" disabled>Closed</button>
-                                    {% elif survey.state == 'deactivate' %}
+                                    {% elif survey.state == 'deactivate' or survey.state == 'adeactivate' %}
                                         <form method='POST'>
                                             <div class="form-group">
                                                 <button type="submit" name="close" value='{{survey.course_name}} {{ survey.course_session}}' class="btn btn-danger">Close</button>

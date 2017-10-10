@@ -67,6 +67,8 @@ def admin_dashboard_add_q(qtype):
                 return render_template('admin_dashboard_create_q.html', question_error=True, n_answers=session['n_answers'], qtype=qtype)
             elif result[1] == 'aerror':
                 return render_template('admin_dashboard_create_q.html', answer_error=True, n_answers=session['n_answers'], qtype=qtype)
+            elif result[1] == 'derror':
+                return render_template('admin_dashboard_create_q.html', duplicate_error=True, n_answers=session['n_answers'], qtype=qtype)
             else:
                 print('error: unexpected error thrown when parsing add_q form')
 

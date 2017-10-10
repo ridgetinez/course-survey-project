@@ -39,6 +39,9 @@
                     {% if question_error %}
                     <div class='alert alert-danger'>You need to enter a question</div>
                     {% endif %}
+                    {% if duplicate_error %}
+                    <div class='alert alert-danger'>This question already exists</div>
+                    {% endif %}
                     <form method="POST">
                         {% if qtype == "mcq" %}
                         {% include "mcq_form.html" %}

@@ -121,7 +121,9 @@ class QuestionController():
             session.commit()
         except:
             print('error: Question alread exists!')
+            return False
         session.close()
+        return True
 
     def get_question(id): # [id, question, answers, deleted]
         DBSession = sessionmaker(bind=engine)
@@ -234,8 +236,10 @@ class SurveyController():
 
             sur = session.query(models.Survey).filter(models.Survey.course_name == survey.course_name).filter(models.Survey.course_session == survey.course_session).first()
 
-            if sur.state != 'closed':
+            if sur.state == 'created' or sur.state == 'review':
                 sur.state = 'deactivate'
+            elif sur.state == 'active':
+                sur.state = 'adeactivate'
             session.commit()
             session.close()
 

@@ -37,7 +37,8 @@ class FormController(object):
         if "" in answers:
             return [False, 'aerror']
 
-        modelcontrollers.QuestionController.write_question([request['question_text'], answers])
+        if modelcontrollers.QuestionController.write_question([request['question_text'], answers]) == False:
+            return [False, 'derror']
         return [True]
 
     def parse_create_survey(request):
@@ -55,7 +56,6 @@ class FormController(object):
             if (item != 'course_name') and (item != 'start-time') and (item != 'end-time'):
                 questions.append(item)
         if len(questions) == 0:
-            print('NO QUESTIONS')
             return [False, 'qerror']
         print(len(questions))
         print(questions)

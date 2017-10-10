@@ -32,7 +32,7 @@
                         <th>Start Time - End Time</th>
                         <th></th>
                         {% for survey in surveys %}
-                            {% if survey.state == 'active' %}
+                            {% if survey.state == 'active' or survey.state == 'adeactivate' %}
                                 <tr>
                                     <td>{{ survey.course_name }} {{ survey.course_session }}</td>
                                     <td>{{ survey.starttime }} - {{ survey.endtime }}</td>
