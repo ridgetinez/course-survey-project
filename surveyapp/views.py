@@ -11,9 +11,9 @@ def index():
         if auth_success == True:    #if authenticated redirect to admin dashboard (user will have cookie marking as auth'd)
             if request.form["user-type"] == "admin":
                 return redirect(url_for("admin_dashboard", sub_page="surveys"))
-            else:
+            else:                    # redirected to staff or student dashboard depending on user type
                 return redirect(url_for("{}_dashboard".format(request.form["user-type"]), id=request.form["id"]))
-        else:                       #render landing page again with notification of invalid login credentials
+        else:                       #if not authenticated, render landing page again with notification of invalid login credentials
             return render_template('landing_page.html', failedAuth=True)
 
     return render_template('landing_page.html')

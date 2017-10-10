@@ -1,3 +1,7 @@
+"""
+readers.py read data from .csv files
+"""
+
 from abc import ABCMeta, abstractmethod
 import csv
 

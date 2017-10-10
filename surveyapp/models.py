@@ -1,3 +1,6 @@
+"""
+models.py uses sqlalchemy to implement database for survey objects
+"""
 
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, ForeignKeyConstraint
 from sqlalchemy.orm import relationship

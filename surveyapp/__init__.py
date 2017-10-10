@@ -1,3 +1,7 @@
+"""
+__init__.py tells server that the directory is a python module
+"""
+
 from flask import Flask
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base

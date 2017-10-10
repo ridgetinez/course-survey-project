@@ -1,3 +1,7 @@
+"""
+auth.py contains a UserAuthoriser and an AuthController to handle the login for into the survey app
+"""
+
 from flask import session, redirect, url_for
 from surveyapp import modelcontrollers
 import sqlite3
