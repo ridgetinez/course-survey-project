@@ -47,7 +47,6 @@ def admin_dashboard_add_q(qtype):
 
     if request.method == 'POST':
         #catch these first
-        print(request.form)
         if 'add_answer' in request.form:
             session['n_answers'] += 1
             return render_template('admin_dashboard_create_q.html', n_answers=session['n_answers'], qtype=qtype)
@@ -116,7 +115,6 @@ def respond(id):
         return redirect(url_for('invalid_permission'))
 
     if request.method == "POST":
-        print(request.form)
         controller.FormController.parse_response(request.form, id)
         return redirect(url_for('student_dashboard', id=id))
     survey_list = session.pop('survey_to_complete').split(" ")
@@ -153,7 +151,7 @@ def review_survey(id):
             modelcontrollers.SurveyController.set_survey_active(survey_as_list[0], survey_as_list[1])
 
             return redirect(url_for('staff_dashboard', id=id))
-        
+
         if 'cancel' in request.form:
             return redirect(url_for('staff_dashboard', id=id))
 

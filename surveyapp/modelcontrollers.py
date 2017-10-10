@@ -111,8 +111,6 @@ class UserController():
 
 class QuestionController():
     def write_question(question_rep): # question_rep = [question_text, [answers]]
-        print('WRITING QUESTION')
-        print(question_rep)
         DBSession = sessionmaker(bind=engine)
         session = DBSession()
         new_question = models.Question(question=question_rep[0], ans="|".join(question_rep[1]), deleted='False')
@@ -168,6 +166,8 @@ class SurveyController():
         state='created'
         if starttime < datetime.now():
             state='review'
+        if endtime < datetime.now():
+            state='deactivate'
         new_survey = models.Survey(course_name=course_name, course_session=course_session, starttime=starttime, endtime=endtime, state=state)
         session.add(new_survey)
         for qid in questions:
@@ -230,7 +230,6 @@ class SurveyController():
 
     def set_deactivate_after_end(survey):
         if survey.endtime < datetime.now():
-            print(survey.course_name + " " + survey.course_session)
             DBSession = sessionmaker(bind=engine)
             session = DBSession()
 
@@ -245,7 +244,6 @@ class SurveyController():
 
     def set_review_after_start(survey):
         if survey.starttime < datetime.now():
-            print(survey.course_name + " " + survey.course_session)
             DBSession = sessionmaker(bind=engine)
             session = DBSession()
 

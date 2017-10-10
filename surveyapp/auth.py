@@ -21,7 +21,6 @@ class UserAuthoriser(object):
             print("Key Error when parsing user data from session")
             return False
         if user_type == user_type_allowed:
-            print("{} {}".format(session["user"]["identifier"], user_id))
             if user_type == "student" or user_type == "staff":
                 if session["user"]["identifier"] != user_id:
                     return False

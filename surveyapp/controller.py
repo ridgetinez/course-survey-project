@@ -25,7 +25,6 @@ class SurveyController(object):
 class FormController(object):
     def parse_create_q(request):
         answers = []
-        print(request)
         for i in range(session['n_answers']):
             answers.append(request['answer' + str(i)])
 
@@ -57,8 +56,6 @@ class FormController(object):
                 questions.append(item)
         if len(questions) == 0:
             return [False, 'qerror']
-        print(len(questions))
-        print(questions)
         if modelcontrollers.SurveyController.write_survey(course[0], course[1], start_time, end_time, questions) == False:
             return [False, 'rerror']
         return [True]
