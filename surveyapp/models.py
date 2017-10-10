@@ -32,7 +32,7 @@ class Enrolment(Base):
 class Question(Base):
     __tablename__ = 'QUESTIONS'
     id = Column(Integer, primary_key=True)
-    question = Column(String, unique=True, nullable=False)
+    question = Column(String, nullable=False)
     ans = Column(String, nullable=False)
     deleted = Column(String, nullable=False)
 

@@ -51,7 +51,7 @@
                                     {% elif survey.state == 'deactivate' or survey.state == 'adeactivate' %}
                                         <form method='POST'>
                                             <div class="form-group">
-                                                <button type="submit" name="close" value='{{survey.course_name}} {{ survey.course_session}}' class="btn btn-danger">Close</button>
+                                                <button type="submit" name="close" value='{{survey.course_name}} {{ survey.course_session}}' class="btn btn-danger">Ready to close</button>
                                             </div>
                                         </form>
                                     {% endif %}

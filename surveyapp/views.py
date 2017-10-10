@@ -153,6 +153,9 @@ def review_survey(id):
             modelcontrollers.SurveyController.set_survey_active(survey_as_list[0], survey_as_list[1])
 
             return redirect(url_for('staff_dashboard', id=id))
+        
+        if 'cancel' in request.form:
+            return redirect(url_for('staff_dashboard', id=id))
 
     try:
         survey = session.pop('survey_to_review')

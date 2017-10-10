@@ -40,7 +40,7 @@
                     <div class='alert alert-danger'>You need to enter a question</div>
                     {% endif %}
                     {% if duplicate_error %}
-                    <div class='alert alert-danger'>This question already exists</div>
+                    <div class='alert alert-danger'>Could not save question to database</div>
                     {% endif %}
                     <form method="POST">
                         {% if qtype == "mcq" %}
