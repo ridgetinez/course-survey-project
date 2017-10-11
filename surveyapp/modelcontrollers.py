@@ -1,3 +1,7 @@
+"""
+modelcontrollers.py contains classes for controllers communicating with the database
+"""
+
 from abc import abstractmethod, ABCMeta
 from ast import literal_eval
 import csv
