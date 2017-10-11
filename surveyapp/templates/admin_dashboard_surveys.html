@@ -35,6 +35,7 @@
                         <th>Course Name</th>
                         <th>Time</th>
                         <th>Status</th>
+                        <th>Metrics</th>
                         {% for survey in surveys %}
                             <tr>
                                 <td>{{ survey.course_name }} {{ survey.course_session}}</td>
@@ -52,6 +53,15 @@
                                         <form method='POST'>
                                             <div class="form-group">
                                                 <button type="submit" name="close" value='{{survey.course_name}} {{ survey.course_session}}' class="btn btn-danger">Ready to close</button>
+                                            </div>
+                                        </form>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if survey.state != 'created' and survey.state != 'review' %}
+                                        <form method='POST'>
+                                            <div class="form-group">
+                                                <button type="submit" name="metrics" value='{{survey.course_name}} {{ survey.course_session}}' class="btn btn-success">Metrics</button>
                                             </div>
                                         </form>
                                     {% endif %}
