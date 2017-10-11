@@ -58,3 +58,7 @@ __writers.py__ - Uses sqlalchemy to write into .csv files and databases
 __static/__ - Contains static files (most IMPORTANTLY our .csv files!)
 
 __templates/__ - Contains Jinja2 templates (front-end application user interface)
+
+### General flow in terms of the files accessed
+
+run.py -> init.py -> views.py <- -> auth.py, modelcontrollers.py, readers.py, writers.py
