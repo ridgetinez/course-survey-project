@@ -65,7 +65,7 @@ class EnrolmentController():
         DBSession = sessionmaker(bind=engine)
         session = DBSession()
 
-        courses = session.query(models.Enrolment).filter(models.Enrolment.uid == user_id).filter(models.Enrolment.completed != 'True').all()
+        courses = session.query(models.Enrolment).filter(models.Enrolment.uid == user_id).all()
         session.close()
         return courses
 
@@ -95,12 +95,13 @@ class UserController():
 
     def get_user_survey(user_id):
         enrolments = EnrolmentController.get_enrolment(user_id)
-        for enrolment in enrolments:
-            print(enrolment.course_name + " " + enrolment.course_session)
         surveys = []
         for enrolment in enrolments:
-            surveys.append(SurveyController.get_survey(enrolment.course_name, enrolment.course_session))
-
+            survey = SurveyController.get_survey(enrolment.course_name, enrolment.course_session)
+            if enrolment.completed != 'True':
+                surveys.append(survey)
+            elif enrolment.completed == 'True' and survey.state == 'closed':
+                surveys.append(survey)
         return surveys
 
     def set_survey_completed(course_name, course_session, user_id):
@@ -279,3 +280,12 @@ class ResponsesController():
         session.add(response)
         session.commit()
         session.close()
+
+    def get_responses(course_name, course_session):
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()
+
+        responses = session.query(models.Responses).filter(models.Responses.course_name == course_name).filter(models.Responses.course_session == course_session).all()
+
+        session.close()
+        return responses
