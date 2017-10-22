@@ -4,19 +4,22 @@
     ADMIN - creation of course survey
     USER - submitting the course survey
     STAFF - review of survey
+- General set up of unit test
+    1. import unittest
+    2. set up a class with (unittest.TestCase)
+    3. have a setup() function
+    4. set up multiple tests starting with "test_...()"
+    5. have a teardown() function
+    6. compile/execute using python3 -m unittest -v test.py
 """
 
 # Vital library used for unit tests
 import unittest
-
-# not sure what todo with the below
-import os
-from server import db
-from dbInteractions import *
-from models import *
-# -----------------------------------
-
+# Import functions from other files in directory
+from surveyapp import writers, views, readers, models, modelcontrollers, auth, controller
+# Functions to use for testing
 from writers import CourseLoader, EnrolmentLoader, UserLoader
+# TODO: i may need more
 
 class Test_Creation_of_Survey(unittest.TestCase):
 
@@ -31,21 +34,19 @@ class Test_Creation_of_Survey(unittest.TestCase):
     - Admin can view the state of the newly created survey from their dashboard
     """
 
-    def setUp(self):
+    def setup(self):
         """
         Load appropriate .csv's for testing
         """
-        #db.create_all()
         cloader = CourseLoader()
         cloader.csv_to_db("static/courses.csv")
         eloader = EnrolmentLoader()
         eloader.csv_to_db("static/enrolments.csv")
         eloader.get_all()
-        uloader = UserLoader()
-        uloader.csv_to_db("static/passwords.csv")
-        uloader.get_all()
+        # uloader = UserLoader()
+        # uloader.csv_to_db("static/passwords.csv")
+        # uloader.get_all()
 
-    # TODO: create appropriate tests for create survey
     def test_valid_create_survey_button(self):
     """
     docstrings to detail what should happen
@@ -54,7 +55,6 @@ class Test_Creation_of_Survey(unittest.TestCase):
         :post : post condition message
     """
     def test_valid_course_session_options(self):
-        etc etc
 
     def test_valid_number_questions(self):
 
@@ -63,6 +63,8 @@ class Test_Creation_of_Survey(unittest.TestCase):
     def test_valid_creation(self):
 
     def test_availability_in_staff_review(self):
+
+    def teardown(self):
 
 class Test_Submitting_Of_Course_Survey(unittest.TestCase):
     """
@@ -73,17 +75,31 @@ class Test_Submitting_Of_Course_Survey(unittest.TestCase):
     - Invariant: If the student has already submitted the survey, they cannot access the survey to complete another row of data
     """
 
-    def setUp(self):
+    def setup(self):
 
     def test_valid_responses(self):
 
     def test_notification_and_reroute(self):
 
     def test_availability_of_completed_survey(self):
-        
+
     def test_valid_write_to_db(self):
 
+    def teardown(self):
 
+class Test_Staff_Review(unittest.TestCase):
+    """
+    ACCEPTANCE CRITERIA
+    - On the staff dashboard, any surveys available for review will be displayed.
+    - Clicking on Review of a particular survey will direct staff to a page with the list of questions on the page. None of these questions will be actionable by the staff.
+    - Clicking on Publish will successfully finish the review process of the survey from the staff.
+    - Given that the survey’s start date is in the past, the survey is now available on student’s enrolled in that survey’s course.
+    """
+    def setup(self):
+
+    def test_
+
+    def teardown(self):
 
 if __name__=="__main__":
     """
@@ -97,15 +113,28 @@ if __name__=="__main__":
 
 """
 -----------------------------------------------------------
- USE BELOW AS REFERENCE
+ THE CODE BELOW WAS USED AS REFERENCE
 -------------------------------------------------------------
 """
 
+"""
+import unittest
+import os
+from server import db
+from dbInteractions import *
+from Model import *
+
 class TestEnrolment(unittest.TestCase):
+
+    def setUp(self):
+        db.create_all()
+        read_all_courses('../courses.csv')
+        read_passwords('../passwords.csv')
+        read_all_enrolments('../Student_enrolments.csv')
 
     def test_enrol_student_invalid_course(self):
         """
-        :post : There will be no changes in the database
+        #:post : There will be no changes in the database
         """
         zID = 12
         course_offering = ""
@@ -120,9 +149,9 @@ class TestEnrolment(unittest.TestCase):
 
     def test_enrol_invalid_user(self):
         """
-        :pre  : The student isn't already enrolled in the course
-        :post : The database will have a relationship between
-                the course offering and the student
+        #:pre  : The student isn't already enrolled in the course
+        #:post : The database will have a relationship between
+        #        the course offering and the student
         """
         zID = "z511"
         course_offering = "COMP1531 17s2"
@@ -137,9 +166,9 @@ class TestEnrolment(unittest.TestCase):
 
     def test_enrol_non_existent_user(self):
         """
-        :pre  : The student isn't already enrolled in the course
-        :post : The database will have a relationship between
-                the course offering and the student
+        #:pre  : The student isn't already enrolled in the course
+        #:post : The database will have a relationship between
+        #        the course offering and the student
         """
         zID = 12
         course_offering = "COMP1531 17s2"
@@ -154,9 +183,9 @@ class TestEnrolment(unittest.TestCase):
 
     def test_enrol_valid(self):
         """
-        :pre  : The student isn't already enrolled in the course
-        :post : The database will have a relationship between
-                the course offering and the student
+        #:pre  : The student isn't already enrolled in the course
+        #:post : The database will have a relationship between
+        #        the course offering and the student
         """
         zID = 571
         course_offering = "COMP1531 17s2"
@@ -175,14 +204,14 @@ class TestAddStaff(unittest.TestCase):
 
     def setUp(self):
         """
-        Create table for tests
+        #Create table for tests
         """
         db.create_all()
         os.system("chmod 766 unique.db")
 
     def test_add_staff_invalid_id(self):
         """
-        :post : No new additions will appear in the db table
+        #:post : No new additions will appear in the db table
         """
         staff_id = ""
         num_staff = len(get_staff(all=True))
@@ -194,8 +223,8 @@ class TestAddStaff(unittest.TestCase):
 
     def test_add_staff_valid_id(self):
         """
-        :pre : The staff member to be inserted doesn't exist yet
-        :post : A new staff member will be added to the table
+        #:pre : The staff member to be inserted doesn't exist yet
+        #:post : A new staff member will be added to the table
         """
         staff_id = 290
         self.assertEqual(get_staff(290), None)
@@ -208,3 +237,7 @@ class TestAddStaff(unittest.TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
+
+if __name__=="__main__":
+    unittest.main()
+"""
