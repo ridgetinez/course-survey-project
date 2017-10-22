@@ -1,6 +1,7 @@
 """
 - Sample unit test set up from the iteration 3 specs
 - Section will be done by Derek
+- Need to test 5 core user stories
 """
 import unittest
 import os
