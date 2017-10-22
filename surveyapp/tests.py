@@ -1,21 +1,65 @@
-"""
+""" Derek Daquel
 - Sample unit test set up from the iteration 3 specs
-- Section will be done by Derek
-- Need to test 5 core user stories
+- Need to test 5 core user stories. Ones I am currently testing are:
+    ADMIN - creation of course survey
+    USER - submitting the course survey
+    STAFF - review of survey
 """
+
+# Vital library used for unit tests
 import unittest
+
+# not sure what todo with the below
 import os
 from server import db
 from dbInteractions import *
-from Model import *
+from models import *
+# -----------------------------------
 
-class TestEnrolment(unittest.TestCase):
+from writers import CourseLoader, EnrolmentLoader, UserLoader
+
+class Test_Creation_of_Survey(unittest.TestCase):
 
     def setUp(self):
-        db.create_all()
-        read_all_courses('../courses.csv')
-        read_passwords('../passwords.csv')
-        read_all_enrolments('../Student_enrolments.csv')
+        """
+        Load appropriate .csv's for testing
+        """
+        #db.create_all()
+        cloader = CourseLoader()
+        cloader.csv_to_db("static/courses.csv")
+        eloader = EnrolmentLoader()
+        eloader.csv_to_db("static/enrolments.csv")
+        eloader.get_all()
+        uloader = UserLoader()
+        uloader.csv_to_db("staticpasswords.csv")
+        uloader.get_all()
+
+    # TODO: create appropriate tests for create survey
+    def test_1(self):
+    """
+    docstrings to detail what should happen
+    e.g.
+        :pre : pre condition message
+        :post : post condition message
+    """
+    def test_2(self):
+        etc etc
+
+class Test_Submitting_Of_Course_Survey(unittest.TestCase):
+    """
+    Refer to set up above
+    """
+
+if __name__=="__main__":
+    """
+    Runs the tests
+    """
+    unittest.main()
+
+""" -----------------------------------------------------------
+- USE BELOW AS REFERENCE
+
+class TestEnrolment(unittest.TestCase):
 
     def test_enrol_student_invalid_course(self):
         """
@@ -122,6 +166,4 @@ class TestAddStaff(unittest.TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
-
-if __name__=="__main__":
-    unittest.main()
+"""
