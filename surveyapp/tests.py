@@ -20,6 +20,17 @@ from writers import CourseLoader, EnrolmentLoader, UserLoader
 
 class Test_Creation_of_Survey(unittest.TestCase):
 
+    """
+    ACCEPTANCE CRITERIA:
+    - Admin can click on Create Survey button from the dashboard to begin creating survey.
+    - Admin can identify which course and session this survey is specifically for.
+    - Admin can select any number of questions of any type to be in the survey. They must at least choose one question to appear in the survey.
+    - Admin can select a start time and end time for the survey.
+    - Admin finalises survey creation by pressing Create button.
+    - This newly created survey should be in Review state and is available on the associated staff for final review.
+    - Admin can view the state of the newly created survey from their dashboard
+    """
+
     def setUp(self):
         """
         Load appropriate .csv's for testing
@@ -31,24 +42,48 @@ class Test_Creation_of_Survey(unittest.TestCase):
         eloader.csv_to_db("static/enrolments.csv")
         eloader.get_all()
         uloader = UserLoader()
-        uloader.csv_to_db("staticpasswords.csv")
+        uloader.csv_to_db("static/passwords.csv")
         uloader.get_all()
 
     # TODO: create appropriate tests for create survey
-    def test_1(self):
+    def test_valid_create_survey_button(self):
     """
     docstrings to detail what should happen
     e.g.
         :pre : pre condition message
         :post : post condition message
     """
-    def test_2(self):
+    def test_valid_course_session_options(self):
         etc etc
+
+    def test_valid_number_questions(self):
+
+    def test_valid_start_end_time(self):
+
+    def test_valid_creation(self):
+
+    def test_availability_in_staff_review(self):
 
 class Test_Submitting_Of_Course_Survey(unittest.TestCase):
     """
-    Refer to set up above
+    ACCEPTANCE CRITERIA
+    - On clicking “SUBMIT” checks are made to ensure each question has one answer (no blank responses).
+    - Reroutes to student dashboard with header notification thanking the student for answering the survey.
+    - The survey that was just completed should not be viewable from the student’s dashboard.
+    - Invariant: If the student has already submitted the survey, they cannot access the survey to complete another row of data
     """
+
+    def setUp(self):
+
+    def test_valid_responses(self):
+
+    def test_notification_and_reroute(self):
+
+    def test_availability_of_completed_survey(self):
+        
+    def test_valid_write_to_db(self):
+
+
 
 if __name__=="__main__":
     """
@@ -56,8 +91,15 @@ if __name__=="__main__":
     """
     unittest.main()
 
-""" -----------------------------------------------------------
-- USE BELOW AS REFERENCE
+
+
+
+
+"""
+-----------------------------------------------------------
+ USE BELOW AS REFERENCE
+-------------------------------------------------------------
+"""
 
 class TestEnrolment(unittest.TestCase):
 
@@ -166,4 +208,3 @@ class TestAddStaff(unittest.TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
-"""
