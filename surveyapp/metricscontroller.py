@@ -24,7 +24,7 @@ class Visualiser(object):
         num_respondents = modelcontrollers.UserController.get_respondents(self.__sname, self.__session)
         responded = ceil(len(responses)/len(questions))
         data = [responded, num_respondents-responded]
-        fig = Visualiser.draw_segmented_hbargraph(data, "Respondents", ["Respondents", "Not Responded"], "Responses for " + self.__sname + self.__session)
+        fig = Visualiser.draw_segmented_hbargraph(data, "Respondents", ["RESP.", "NORESP."], "Responses for " + self.__sname + self.__session)
         fig.savefig('./surveyapp/static/' +  self.__sname + self.__session)
         # jndividual questions will have 0 length answers
 
