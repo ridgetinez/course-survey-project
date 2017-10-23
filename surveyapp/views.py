@@ -1,5 +1,18 @@
-from surveyapp import app, readers, modelcontrollers, auth, controller
-from flask import render_template, session, redirect, url_for, request
+from surveyapp import app, readers, modelcontrollers, auth, controller, metricscontroller
+from flask import render_template, session, redirect, url_for, request, send_file
+import io
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+# from matplotlib.dates import DateFormatter
+import numpy as np
+import os
+
+@app.after_request
+def add_header(response):
+    response.cache_control.max_age = 1
+    return response
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -41,7 +54,7 @@ def admin_dashboard(sub_page):
                 survey_list = request.form['close'].split(" ")
                 modelcontrollers.SurveyController.close_survey(survey_list[0], survey_list[1])
             if "metrics" in request.form:
-                session["survey_metrics"] = request.form["metrics"]
+                session["survey_metrics"] = request.form["metrics"]     # note session acts like a global array to pass values
                 return redirect(url_for('metrics'))
         return render_template('admin_dashboard_surveys.html', surveys=modelcontrollers.SurveyController.get_all_surveys())
     if sub_page == 'questions':
@@ -152,7 +165,7 @@ def student_dashboard(id):
             return redirect(url_for('respond', id=id))
         if "metrics" in request.form:
             session["survey_metrics"] = request.form["metrics"]
-            return redirect(url_for('metrics'))
+            return redirect(url_for('metrics'))        
 
     if modelcontrollers.UserController.check_guest_approved(id) == False: #catch unnaproved guests
         return render_template("student_dashboard.html")
@@ -218,9 +231,16 @@ def metrics():
         survey = session.pop('survey_metrics')
     except KeyError:
         return redirect(url_for('invalid_permission'))
-    survey_as_list = survey.split(" ");
-
-    return render_template("view_metrics.html", responses=modelcontrollers.ResponsesController.get_responses(survey_as_list[0], survey_as_list[1]), get_question=modelcontrollers.QuestionController.get_question, course_name=survey_as_list[0], course_session=survey_as_list[1])
+    surveyID = survey.split(" ")
+    visualiser = metricscontroller.Visualiser(surveyID[0], surveyID[1])
+    print(visualiser.visualise_student_engagement())
+    visualiser.visualise_survey_questions()
+    filenames = visualiser.visualise_survey_questions()     # filenames is a list of the charts to display
+                                                            # these filenames are for ones in static
+                                                            # look at the one I do for student_engagement to check out (esp. |autoversion)
+    print(filenames)
+    survey_questions = modelcontrollers.SurveyController.get_survey_questions(surveyID[0], surveyID[1])     # in case you need the questions for displaying the answers it's here
+    return render_template("view_metrics.html", responses=modelcontrollers.ResponsesController.get_responses(surveyID[0], surveyID[1]), get_question=modelcontrollers.QuestionController.get_question, course_name=surveyID[0], course_session=surveyID[1])
 
 
 @app.route('/invalid_permission')
@@ -234,3 +254,16 @@ def logout():
     except:
         pass
     return redirect(url_for("index"))
+
+@app.template_filter('autoversion')
+def autoversion_filter(filename):
+    path = os.path.join('surveyapp/', filename[1:])    # avoid preceeding forward slash
+    print(path)
+    try:
+        timestamp = str(os.path.getmtime(path))
+    except OSError:
+        return filename
+    queried_name = "{0}?v={1}".format(filename, timestamp)
+    print(queried_name)
+    return queried_name
+
