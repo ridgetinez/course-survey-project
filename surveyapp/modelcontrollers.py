@@ -113,7 +113,7 @@ class UserController():
                 return False
         except AttributeError:
             return False
-        
+
     def get_user_survey(user_id):
         enrolments = EnrolmentController.get_enrolment(user_id)
         surveys = []
@@ -170,10 +170,10 @@ class UserController():
             return True
 
 class QuestionController():
-    def write_question(question_rep): # question_rep = [question_text, [answers]]
+    def write_question(question_rep): # question_rep = [question_text, [answers], is_optional]
 
         session = DBSession()
-        new_question = models.Question(question=question_rep[0], ans="|".join(question_rep[1]), deleted='False')
+        new_question = models.Question(question=question_rep[0], ans="|".join(question_rep[1]), deleted='False', is_optional=question_rep[2])
         session.add(new_question)
         try:
             session.commit()
@@ -192,14 +192,16 @@ class QuestionController():
         session.close()
         return [question.id, question.question, QuestionController.reformat_ans(question.ans), question.deleted]
 
-    def get_all_questions():
+    def get_all_questions(mandatory_only):
 
         session = DBSession()
-
-        questions = session.query(models.Question).all()
+        if mandatory_only == 'True':
+            questions = session.query(models.Question).filter(models.Question.is_optional == 'False').all()
+        else:
+            questions = session.query(models.Question).all()
         question_list = []
         for question in questions:
-            question_list.append([question.id, question.question, QuestionController.reformat_ans(question.ans), question.deleted])
+            question_list.append([question.id, question.question, QuestionController.reformat_ans(question.ans), question.deleted, question.is_optional])
 
         session.close()
         return question_list
@@ -218,6 +220,19 @@ class QuestionController():
         question.deleted = 'True'
         session.commit()
         session.close()
+
+    def get_optional_questions():
+        session = DBSession()
+
+        questions = session.query(models.Question).filter(models.Question.is_optional == 'True').all()
+
+        question_list = []
+        for question in questions:
+            question_list.append([question.id, question.question, QuestionController.reformat_ans(question.ans), question.deleted])
+
+        session.close()
+
+        return question_list
 
 class SurveyController():
     def write_survey(course_name, course_session, starttime, endtime, questions):
@@ -313,6 +328,7 @@ class SurveyController():
                 sur.state = 'review'
             session.commit()
             session.close()
+
     def close_survey(course_name, course_session):
 
         session = DBSession()
@@ -324,6 +340,19 @@ class SurveyController():
 
         session.commit()
         session.close
+
+    def survey_add_questions(course, questions):
+
+        session = DBSession()
+
+        course_list = course.split(" ")
+        for qid in questions:
+            new_question = models.SurveyQStore(course_name=course_list[0], course_session=course_list[1], qid=qid)
+            session.add(new_question)
+
+        session.commit()
+        session.close()
+
 
 class ResponsesController():
     def write_response(course_name, course_session, qid, response):
@@ -337,7 +366,7 @@ class ResponsesController():
         session.close()
 
     def get_responses(course_name, course_session):
-        DBSession = sessionmaker(bind=engine)
+
         session = DBSession()
 
         responses = session.query(models.Responses).filter(models.Responses.course_name == course_name).filter(models.Responses.course_session == course_session).all()

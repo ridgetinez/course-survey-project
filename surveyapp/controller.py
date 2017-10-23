@@ -13,7 +13,7 @@ class FormController(object):
             auth.UserAuthoriser.provideUserSession({'identifier' : user.uid, 'role' : user.role})
             return True
         return False
-    
+
     def parse_create_q(request):
         answers = []
         for i in range(session['n_answers']):
@@ -27,7 +27,7 @@ class FormController(object):
         if "" in answers:
             return [False, 'aerror']
 
-        if modelcontrollers.QuestionController.write_question([request['question_text'], answers]) == False:
+        if modelcontrollers.QuestionController.write_question([request['question_text'], answers, request['optional']]) == False:
             return [False, 'derror']
         return [True]
 
@@ -50,6 +50,13 @@ class FormController(object):
         if modelcontrollers.SurveyController.write_survey(course[0], course[1], start_time, end_time, questions) == False:
             return [False, 'rerror']
         return [True]
+
+    def review_add_questions(request):
+        questions = []
+        for item in request:
+            if (item != 'accept'):
+                questions.append(item)
+        modelcontrollers.SurveyController.survey_add_questions(request['accept'], questions)
 
     def parse_response(request, user_id):
         survey_list = request['course'].split(" ")

@@ -39,6 +39,7 @@
                             <th>ID</th>
                             <th>Question</th>
                             <th>Answers</th>
+                            <th>Optional?</th>
                             <th></th>
                         </tr>
                         {% for question in questions %}
@@ -55,6 +56,9 @@
                                             <p>N/A</p>
                                         {% endif %}
                                         </ul>
+                                    </td>
+                                    <td>
+                                        {{ question[4] }}
                                     </td>
                                     <td>
                                         <form method="POST">
