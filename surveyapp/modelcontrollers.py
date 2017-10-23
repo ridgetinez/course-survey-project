@@ -206,7 +206,7 @@ class QuestionController():
         return q[1]
 
     #initial problem
-    def get_all_questions():
+    def get_all_questions(mandatory_only):
         session = DBSession()
         if mandatory_only == 'True':
             questions = session.query(models.Question).filter(models.Question.is_optional == 'False').all()
