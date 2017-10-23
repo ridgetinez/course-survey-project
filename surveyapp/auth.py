@@ -35,7 +35,6 @@ class AuthController(object):
     """
     def login(user_type, identifier, password):
         password_correct = modelcontrollers.UserController.check_password(identifier, password)
-
         if password_correct == False:
             return False
 

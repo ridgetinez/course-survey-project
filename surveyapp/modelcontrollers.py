@@ -106,11 +106,14 @@ class UserController():
         user = session.query(models.User).filter(models.User.uid == user_name).first()
 
         session.close()
-        if user.password == password:
-            return True
-        else:
+        try:
+            if user.password == password:
+                return True
+            else:
+                return False
+        except AttributeError:
             return False
-
+        
     def get_user_survey(user_id):
         enrolments = EnrolmentController.get_enrolment(user_id)
         surveys = []
@@ -158,7 +161,7 @@ class UserController():
         guest = session.query(models.Guest).filter(models.Guest.uid == identifier).first()
         if guest == None:
             return True
-        
+
         if guest.enrolled == 'False':
             session.close()
             return False
