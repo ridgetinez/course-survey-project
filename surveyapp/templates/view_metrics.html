@@ -6,13 +6,29 @@
 <!-- Page Body -->
 {% block content %}
 <div class="container" style="padding-top:20px">
-    <img src="{{ url_for('static', filename=course_name+course_session+'.png')|autoversion }}" />
+    <div class="row" style="padding-top:10px">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">Engagement</div>
+                <div class="card-body"><img src="{{ url_for('static', filename=course_name+course_session+'.png')|autoversion }}" /></div>
+            </div>
+        </div>
+    </div>
     <!-- START DISPLAYING CHARTS FOR EACH MULTIPLE CHOICE QUESTION WITH ANSWER CHOICES DISPLAYED UNDER EACH CHART -->
-
+    {% for chart in charts %}
+    <div class="row" style="padding-top:10px">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">{{chart}}</div>
+                <div class="card-body"><img src="{{ url_for('static', filename={{chart}}+'.png')|autoversion }}" /></div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
     <!-- END CHART DISPLAYING -->
 
     <!-- WE STILL NEED THIS STUFF FOR REQUIREMENTS -->
-    <div class="row">
+    <div class="row" style="padding-top:10px">
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header bg-dark text-white">Responses for {{ course_name }} {{ course_session }}</div>

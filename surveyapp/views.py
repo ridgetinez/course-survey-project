@@ -165,7 +165,7 @@ def student_dashboard(id):
             return redirect(url_for('respond', id=id))
         if "metrics" in request.form:
             session["survey_metrics"] = request.form["metrics"]
-            return redirect(url_for('metrics'))        
+            return redirect(url_for('metrics'))
 
     if modelcontrollers.UserController.check_guest_approved(id) == False: #catch unnaproved guests
         return render_template("student_dashboard.html")
@@ -240,7 +240,7 @@ def metrics():
                                                             # look at the one I do for student_engagement to check out (esp. |autoversion)
     print(filenames)
     survey_questions = modelcontrollers.SurveyController.get_survey_questions(surveyID[0], surveyID[1])     # in case you need the questions for displaying the answers it's here
-    return render_template("view_metrics.html", responses=modelcontrollers.ResponsesController.get_responses(surveyID[0], surveyID[1]), get_question=modelcontrollers.QuestionController.get_question, course_name=surveyID[0], course_session=surveyID[1])
+    return render_template("view_metrics.html", responses=modelcontrollers.ResponsesController.get_responses(surveyID[0], surveyID[1]), get_question=modelcontrollers.QuestionController.get_question, course_name=surveyID[0], course_session=surveyID[1], charts=filenames)
 
 
 @app.route('/invalid_permission')
@@ -266,4 +266,3 @@ def autoversion_filter(filename):
     queried_name = "{0}?v={1}".format(filename, timestamp)
     print(queried_name)
     return queried_name
-
