@@ -146,7 +146,7 @@ def student_dashboard(id):
         if "metrics" in request.form:
             session["survey_metrics"] = request.form["metrics"]
             return redirect(url_for('metrics'))
-        
+
     return render_template("student_dashboard.html", surveys=modelcontrollers.UserController.get_user_survey(id))
 
 @app.route('/staffdashboard/<id>', methods=['GET', 'POST'])
