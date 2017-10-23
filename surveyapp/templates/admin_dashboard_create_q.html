@@ -13,6 +13,9 @@
       <li class="nav-item">
         <a class="nav-link" href="../../questions"> Questions</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="guests"> Guests </a>
+      </li>
     </ul>
 </div>
 <ul class="navbar-nav mr-auto float-right">
@@ -43,6 +46,13 @@
                     <div class='alert alert-danger'>Could not save question to database</div>
                     {% endif %}
                     <form method="POST">
+                        <div class="form-group">
+                            <label for="optional">Optional?</label>
+                            <select class="form-control" name="optional">
+                                <option>True</option>
+                                <option>False</option>
+                            </select>
+                        </div>
                         {% if qtype == "mcq" %}
                         {% include "mcq_form.html" %}
                         {% elif qtype == "textans" %}

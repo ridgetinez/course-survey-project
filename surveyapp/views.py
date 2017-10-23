@@ -18,23 +18,25 @@ def add_header(response):
 def index():
     """ Returns/renders the admin dashboard page (if access authorised) or the landing page (if access not authorised) """
 
-    if 'user' in session: #redirect if already logged in
-        if session["user"]["role"] == 'admin':
-            return redirect(url_for("admin_dashboard", sub_page='surveys'))
-        else:
-            return redirect(url_for("{}_dashboard".format(session["user"]["role"]), id=session["user"]["identifier"]))
+    if "user" in session:
+        if session["user"]["role"] == "admin":
+            return redirect(url_for("admin_dashboard", sub_page="surveys"))
+        elif session["user"]["role"] == "staff":
+            return redirect(url_for("staff_dashboard", id=session["user"]["identifier"]))
+        elif session["user"]["role"] == "student" or session["user"]["role"] == "guest":
+            return redirect(url_for("student_dashboard", id=session["user"]["identifier"]))
 
     if request.method == 'POST':
-        #attempt to authenticate user using information from login form
-        auth_success = auth.AuthController.login(request.form["user-type"], request.form["id"], request.form["password"])
+        #redirect to register page
+        if 'register' in request.form:
+            return redirect(url_for('register_account'))
 
-        if auth_success == True:    #if authenticated redirect to admin dashboard (user will have cookie marking as auth'd)
-            if request.form["user-type"] == "admin":
-                return redirect(url_for("admin_dashboard", sub_page="surveys"))
-            else:                    # redirected to staff or student dashboard depending on user type
-                return redirect(url_for("{}_dashboard".format(request.form["user-type"]), id=request.form["id"]))
-        else:                       #if not authenticated, render landing page again with notification of invalid login credentials
-            return render_template('landing_page.html', failedAuth=True)
+        #attempt to authenticate user using information from login form
+        auth_success = controller.FormController.parse_login(request.form)
+        if auth_success == True:
+            return redirect(url_for("index"))
+        #if not authenticated, render landing page again with notification of invalid login credentials
+        return render_template('landing_page.html', failedAuth=True)
 
     return render_template('landing_page.html')
 
@@ -59,7 +61,12 @@ def admin_dashboard(sub_page):
         if request.method == 'POST':
             if "delete" in request.form:
                 modelcontrollers.QuestionController.delete_question(request.form["delete"])
-        return render_template('admin_dashboard_questions.html', questions=modelcontrollers.QuestionController.get_all_questions())
+        return render_template('admin_dashboard_questions.html', questions=modelcontrollers.QuestionController.get_all_questions('False'))
+    if sub_page == 'guests':
+        if request.method == 'POST':
+            modelcontrollers.EnrolmentController.approve_enrolment(request.form["approve"])
+
+        return render_template('admin_dashboard_guests.html', guests=modelcontrollers.UserController.get_unnaproved_guests(), get_courses=modelcontrollers.EnrolmentController.get_enrolment)
 
 
 @app.route('/dashboard/add/question/<qtype>', methods=['GET', 'POST'])
@@ -130,11 +137,11 @@ def admin_dashboard_add_s():
 
         return redirect(url_for('admin_dashboard', sub_page='surveys'))
 
-    return render_template('admin_dashboard_create_survey.html', questions=modelcontrollers.QuestionController.get_all_questions(), course_list=modelcontrollers.CourseController.get_courses())
+    return render_template('admin_dashboard_create_survey.html', questions=modelcontrollers.QuestionController.get_all_questions('True'), course_list=modelcontrollers.CourseController.get_courses())
 
 @app.route('/survey/respond/<id>', methods=['POST', 'GET'])
 def respond(id):
-    if auth.UserAuthoriser.check_permission("student", id) == False:
+    if (auth.UserAuthoriser.check_permission("student", id) or auth.UserAuthoriser.check_permission("guest", id)) == False:
         return redirect(url_for('invalid_permission'))
 
     if request.method == "POST":
@@ -149,7 +156,7 @@ def respond(id):
 
 @app.route('/studentdashboard/<id>', methods=['GET','POST'])
 def student_dashboard(id):
-    if auth.UserAuthoriser.check_permission("student", id) == False:
+    if (auth.UserAuthoriser.check_permission("student", id) or auth.UserAuthoriser.check_permission("guest", id)) == False:
         return redirect(url_for('invalid_permission'))
 
     if request.method == 'POST':
@@ -158,8 +165,11 @@ def student_dashboard(id):
             return redirect(url_for('respond', id=id))
         if "metrics" in request.form:
             session["survey_metrics"] = request.form["metrics"]
-            return redirect(url_for('metrics'))
-        
+            return redirect(url_for('metrics'))        
+
+    if modelcontrollers.UserController.check_guest_approved(id) == False: #catch unnaproved guests
+        return render_template("student_dashboard.html")
+
     return render_template("student_dashboard.html", surveys=modelcontrollers.UserController.get_user_survey(id))
 
 @app.route('/staffdashboard/<id>', methods=['GET', 'POST'])
@@ -186,7 +196,7 @@ def review_survey(id):
         if 'accept' in request.form:
             survey_as_list = request.form['accept'].split(" ")
             modelcontrollers.SurveyController.set_survey_active(survey_as_list[0], survey_as_list[1])
-
+            controller.FormController.review_add_questions(request.form)
             return redirect(url_for('staff_dashboard', id=id))
 
         if 'cancel' in request.form:
@@ -197,7 +207,23 @@ def review_survey(id):
     except KeyError:
         return redirect(url_for('invalid_permission'))
     survey_as_list = survey.split(" ");
-    return render_template("review_survey.html", survey=modelcontrollers.SurveyController.get_survey(survey_as_list[0], survey_as_list[1]), questions=modelcontrollers.SurveyController.get_survey_questions(survey_as_list[0], survey_as_list[1]))
+    return render_template("review_survey.html", survey=modelcontrollers.SurveyController.get_survey(survey_as_list[0], survey_as_list[1]), questions=modelcontrollers.SurveyController.get_survey_questions(survey_as_list[0], survey_as_list[1]), optional_questions=modelcontrollers.QuestionController.get_optional_questions())
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register_account():
+    if request.method == 'POST':
+        if 'cancel' in request.form:
+            return redirect(url_for('index'))
+        success = controller.FormController.parse_register(request.form)
+        if success[0] == False:
+            if success[1] == 'derror':
+                return render_template("guest_register.html", derror=True, course_list=modelcontrollers.CourseController.get_courses())
+            elif success[1] == 'merror':
+                return render_template("guest_register.html", merror=True, course_list=modelcontrollers.CourseController.get_courses())
+        else:
+            return redirect(url_for('index'))
+    return render_template("guest_register.html", course_list=modelcontrollers.CourseController.get_courses())
 
 @app.route('/metrics')
 def metrics():
@@ -215,6 +241,7 @@ def metrics():
     print(filenames)
     survey_questions = modelcontrollers.SurveyController.get_survey_questions(surveyID[0], surveyID[1])     # in case you need the questions for displaying the answers it's here
     return render_template("view_metrics.html", responses=modelcontrollers.ResponsesController.get_responses(surveyID[0], surveyID[1]), get_question=modelcontrollers.QuestionController.get_question, course_name=surveyID[0], course_session=surveyID[1])
+
 
 @app.route('/invalid_permission')
 def invalid_permission():

@@ -13,6 +13,9 @@
       <li class="nav-item active">
         <a class="nav-link" href=""> Questions <span class="sr-only">(current)</span></a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="guests"> Guests </a>
+      </li>
     </ul>
 </div>
 <ul class="navbar-nav mr-auto float-right">
@@ -36,6 +39,7 @@
                             <th>ID</th>
                             <th>Question</th>
                             <th>Answers</th>
+                            <th>Optional?</th>
                             <th></th>
                         </tr>
                         {% for question in questions %}
@@ -52,6 +56,9 @@
                                             <p>N/A</p>
                                         {% endif %}
                                         </ul>
+                                    </td>
+                                    <td>
+                                        {{ question[4] }}
                                     </td>
                                     <td>
                                         <form method="POST">
