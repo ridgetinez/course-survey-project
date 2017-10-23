@@ -6,22 +6,15 @@
 <!-- Page Body -->
 {% block content %}
 <div class="container" style="padding-top:20px">
-    <div class="row" style="padding-top:10px">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header bg-dark text-white">Engagement</div>
-                <div class="card-body"><img src="{{ url_for('static', filename=course_name+course_session+'.png')|autoversion }}" /></div>
-            </div>
-        </div>
-    </div>
     <!-- START DISPLAYING CHARTS FOR EACH MULTIPLE CHOICE QUESTION WITH ANSWER CHOICES DISPLAYED UNDER EACH CHART -->
     {% for chart in charts %}
     <div class="row" style="padding-top:10px">
         <div class="col-sm-12">
             <div class="card">
-                <div class="card-header bg-dark text-white">{{chart}}</div>
-                <div class="card-body"><img src="{{ url_for('static', filename=chart+'.png')|autoversion }}" /></div>
-            </div>
+                <div class="card-header bg-dark text-white"></div>
+                <div class="card-body">
+                    <img src="{{ url_for('static', filename=chart+'.png')|autoversion }}" /></div> 
+                </div>
         </div>
     </div>
     {% endfor %}
@@ -42,7 +35,7 @@
                             <td>{{ question[1] }} </td>
                             <td>
                                 {% if question[2] | length != 0 %}
-                                    {{ question[2][response.response | int] }}
+                                [{{ response.response | int }}] {{ question[2][response.response | int] }}
                                 {% else %}
                                     {{ response.response }}
                                 {% endif %}
