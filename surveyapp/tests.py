@@ -13,18 +13,16 @@
     6. compile/execute using python3 -m unittest -v test.py
 """
 
-# Vital library used for unit tests
-import unittest
-# Import functions from other files in directory
-from surveyapp import writers, views, readers, models, modelcontrollers, auth, controller
-# Functions to use for testing
-from writers import CourseLoader, EnrolmentLoader, UserLoader
+import unittest # Vital library used for unit tests
+from surveyapp import * # Import all associated functions/variables from surveyapp's files
+from writers import CourseLoader, EnrolmentLoader, UserLoader # Functions to use for testing
 # TODO: i may need more
 
+# --------------------------------------------------------------------------------------------
 class Test_Creation_of_Survey(unittest.TestCase):
 
     """
-    ACCEPTANCE CRITERIA:
+    ACCEPTANCE CRITERIA (BACKEND):
     - Admin can click on Create Survey button from the dashboard to begin creating survey.
     - Admin can identify which course and session this survey is specifically for.
     - Admin can select any number of questions of any type to be in the survey. They must at least choose one question to appear in the survey.
@@ -38,34 +36,54 @@ class Test_Creation_of_Survey(unittest.TestCase):
         """
         Load appropriate .csv's for testing
         """
+
+        db.create_all()
         cloader = CourseLoader()
         cloader.csv_to_db("static/courses.csv")
         eloader = EnrolmentLoader()
         eloader.csv_to_db("static/enrolments.csv")
         eloader.get_all()
-        # uloader = UserLoader()
-        # uloader.csv_to_db("static/passwords.csv")
-        # uloader.get_all()
+        uloader = UserLoader()
+        uloader.csv_to_db("static/passwords.csv")
+        uloader.get_all()
 
-    def test_valid_create_survey_button(self):
+    def test_valid_number_questions(self):
+        """
+            :pre : pre condition message
+            :post : post condition message
+        """
+
+        self.assertGreater(n_chosen_questions, 1)
+
+    def test_valid_start_end_time(self):
     """
-    docstrings to detail what should happen
-    e.g.
         :pre : pre condition message
         :post : post condition message
     """
-    def test_valid_course_session_options(self):
 
-    def test_valid_number_questions(self):
-
-    def test_valid_start_end_time(self):
+        start_time = models.Survey.time
+        end_time = models.Survey.endtime
+        self.assertGreater(start_time, end_time);
 
     def test_valid_creation(self):
+    """
+        :pre : pre condition message
+        :post : post condition message
+    """
 
     def test_availability_in_staff_review(self):
+    """
+        :pre : pre condition message
+        :post : post condition message
+    """
+        survey = session.query(models.Survey).filter(models.Survey.course_name == survey.course_name).filter(models.Survey.course_session == survey.course_session).first()
+        modelcontrollers.SurveyController.set_review_after_start()
+        assertEqual(survey.state, 'review')
 
     def teardown(self):
-
+        db.session.remove()
+        db.drop_all()
+# ------------------------------------------------------------------------------------------------------
 class Test_Submitting_Of_Course_Survey(unittest.TestCase):
     """
     ACCEPTANCE CRITERIA
@@ -76,17 +94,27 @@ class Test_Submitting_Of_Course_Survey(unittest.TestCase):
     """
 
     def setup(self):
-
+        db.create_all()
+        cloader = CourseLoader()
+        cloader.csv_to_db("static/courses.csv")
+        eloader = EnrolmentLoader()
+        eloader.csv_to_db("static/enrolments.csv")
+        eloader.get_all()
+        uloader = UserLoader()
+        uloader.csv_to_db("static/passwords.csv")
+        uloader.get_all()
     def test_valid_responses(self):
 
-    def test_notification_and_reroute(self):
+    #def test_notification_and_reroute(self):
 
     def test_availability_of_completed_survey(self):
 
     def test_valid_write_to_db(self):
 
     def teardown(self):
-
+        db.session.remove()
+        db.drop_all()
+# --------------------------------------------------------------------------------------
 class Test_Staff_Review(unittest.TestCase):
     """
     ACCEPTANCE CRITERIA
@@ -96,17 +124,27 @@ class Test_Staff_Review(unittest.TestCase):
     - Given that the survey’s start date is in the past, the survey is now available on student’s enrolled in that survey’s course.
     """
     def setup(self):
-
-    def test_
+        db.create_all()
+        cloader = CourseLoader()
+        cloader.csv_to_db("static/courses.csv")
+        eloader = EnrolmentLoader()
+        eloader.csv_to_db("static/enrolments.csv")
+        eloader.get_all()
+        uloader = UserLoader()
+        uloader.csv_to_db("static/passwords.csv")
+        uloader.get_all()
+    def test_survey_state_change(self):
 
     def teardown(self):
-
+        db.session.remove()
+        db.drop_all()
+# -------------------------------------------------------------------
 if __name__=="__main__":
     """
-    Runs the tests
     """
+    Runs the tests
     unittest.main()
-
+# --------------------------------------------------------------------
 
 
 
