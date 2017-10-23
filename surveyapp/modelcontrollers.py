@@ -69,6 +69,7 @@ class EnrolmentController():
         session.close()
         return courses
 
+
 class UserController():
     def write_user(user_rep): # user_rep = [identifier, password, role]
         DBSession = sessionmaker(bind=engine)
@@ -113,6 +114,16 @@ class UserController():
         enrolment.completed = 'True'
         session.commit()
         session.close()
+
+    def get_respondents(course_name, course_session):
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()
+        
+        respondents = session.query(models.Enrolment).filter(models.Enrolment.course_name == course_name).filter(models.Enrolment.course_session == course_session).all()
+        # remove rows which are staff checked from the user table
+        session.close()
+        return len(respondents);
+
 
 class QuestionController():
     def write_question(question_rep): # question_rep = [question_text, [answers]]

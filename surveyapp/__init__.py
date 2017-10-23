@@ -23,8 +23,19 @@ modelcontrollers.CSVloader.get_course_csv()
 modelcontrollers.CSVloader.get_enrolement_csv()
 
 app = Flask(__name__)
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1
 
 #used for session encryption
 app.secret_key = 'Minjie'
 
 import surveyapp.views
+
+@app.after_request
+def add_header(response):
+    print("I'm in here")
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    response.headers["Cache-Control"] = 'public, max-age=0'
+    response.cache_control.max_age = 1
+    return response
