@@ -90,12 +90,11 @@ class UserController():
             enrolment = user_rep[3].split(' ')
             EnrolmentController.write_enrolment([enrolment[0], enrolment[1], user_rep[0]])
         session.add(new_user)
+        success = True
         try:
             session.commit()
-            success = True
         except:
             success = False
-            pass
         session.close()
         return success
 
