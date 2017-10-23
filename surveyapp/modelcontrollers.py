@@ -65,17 +65,36 @@ class EnrolmentController():
         session.close()
         return courses
 
-class UserController():
-    def write_user(user_rep): # user_rep = [identifier, password, role]
+    def approve_enrolment(user_id):
         DBSession = sessionmaker(bind=engine)
         session = DBSession()
-        new_user = models.User(uid=user_rep[0], password=user_rep[1], role=user_rep[2])
+
+        user = session.query(models.Guest).filter(models.Guest.uid == user_id).first()
+
+        user.enrolled = "True"
+
+        session.commit()
+        session.close()
+
+class UserController():
+    def write_user(user_rep): # user_rep = [identifier, password, role] guest has an extra field for enrolment application
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()
+        if user_rep[2] != 'guest':
+            new_user = models.User(uid=user_rep[0], password=user_rep[1], role=user_rep[2])
+        else:
+            new_user = models.Guest(uid=user_rep[0], password=user_rep[1], role=user_rep[2], enrolled='False')
+            enrolment = user_rep[3].split(' ')
+            EnrolmentController.write_enrolment([enrolment[0], enrolment[1], user_rep[0]])
         session.add(new_user)
         try:
             session.commit()
+            success = True
         except:
+            success = False
             pass
         session.close()
+        return success
 
     def check_password(user_name, password):
         DBSession = sessionmaker(bind=engine)
@@ -108,6 +127,37 @@ class UserController():
         enrolment.completed = 'True'
         session.commit()
         session.close()
+
+    def get_user(identifier):
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()
+
+        user = session.query(models.User).filter(models.User.uid == identifier).first()
+
+        session.close()
+
+        return user
+
+    def get_unnaproved_guests():
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()
+
+        guests = session.query(models.Guest).filter(models.Guest.enrolled == 'False').all()
+
+        session.close()
+
+        return guests
+
+    def check_guest_approved(identifier):
+        user = UserController.get_user(identifier)
+
+        try:
+            if user.enrolled == 'False':
+                return False
+            else:
+                return True
+        except:
+            return True
 
 class QuestionController():
     def write_question(question_rep): # question_rep = [question_text, [answers]]

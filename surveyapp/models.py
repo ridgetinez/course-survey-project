@@ -12,6 +12,32 @@ class User(Base):
     password = Column(String, nullable=False)
     role = Column(String, nullable=False)
 
+    __mapper_args__ = {
+        'polymorphic_on': role,
+        'polymorphic_identity': 'user'
+    }
+
+class Admin(User):
+    __mapper_args__ = {
+        'polymorphic_identity': 'admin'
+    }
+
+class Staff(User):
+    __mapper_args__ = {
+        'polymorphic_identity': 'staff'
+    }
+
+class Student(User):
+    __mapper_args__ = {
+        'polymorphic_identity': 'student'
+    }
+
+class Guest(User):
+    enrolled = Column(String)
+    __mapper_args__ = {
+        'polymorphic_identity': 'guest'
+    }
+
 class Course(Base):
     __tablename__ = 'COURSES'
     name = Column(String, primary_key=True)
