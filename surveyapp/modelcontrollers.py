@@ -8,6 +8,7 @@ import csv
 from surveyapp import models, engine
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
+from sqlalchemy import func
 
 class CSVloader():
     def get_users_csv():
@@ -147,6 +148,10 @@ class QuestionController():
 
         session.close()
         return [question.id, question.question, QuestionController.reformat_ans(question.ans), question.deleted]
+
+    def get_question_text(id):
+        q = QuestionController.get_question(id)
+        return q[1]
 
     def get_all_questions():
         DBSession = sessionmaker(bind=engine)
@@ -300,3 +305,13 @@ class ResponsesController():
 
         session.close()
         return responses
+
+    def num_answers(course_name:str, course_session:str, qid:int, answer:int):
+        print(course_name, course_session, qid, answer)
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()
+        responses = session.query(models.Responses.id).filter(models.Responses.course_name == course_name).filter(models.Responses.course_session == course_session).filter(models.Responses.qid == qid).filter(models.Responses.response == str(answer)).all()
+        n = len(responses)
+        
+        session.close()
+        return n

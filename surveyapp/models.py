@@ -78,3 +78,4 @@ class Responses(Base):
     __table_args__ = (ForeignKeyConstraint([course_name, course_session],
                                            [Survey.course_name, Survey.course_session]),
                                            {})
+                                           
