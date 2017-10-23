@@ -20,7 +20,7 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header bg-dark text-white">{{chart}}</div>
-                <div class="card-body"><img src="{{ url_for('static', filename={{chart}}+'.png')|autoversion }}" /></div>
+                <div class="card-body"><img src="{{ url_for('static', filename=chart+'.png')|autoversion }}" /></div>
             </div>
         </div>
     </div>
