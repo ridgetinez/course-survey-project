@@ -361,8 +361,13 @@ class ResponsesController():
         response = models.Responses(course_name=course_name, course_session=course_session, qid=qid, response=response)
 
         session.add(response)
-        session.commit()
+        try:
+            session.commit()
+        except:
+            session.close()
+            return False
         session.close()
+        return True
 
     def get_responses(course_name, course_session):
 
