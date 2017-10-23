@@ -32,16 +32,24 @@
                         <th>Opening - Closing</th>
                         <th></th>
                         {% for survey in surveys %}
-                        {% if survey.state == 'review' or survey.state == 'deactivate' %}
+                        {% if survey.state == 'review' or survey.state == 'deactivate' or survey.state == 'closed' %}
                             <tr>
                                 <td>{{ survey.course_name }} {{ survey.course_session}}</td>
                                 <td>{{survey.starttime}} - {{survey.endtime}}</td>
                                 <td>
+                                    {% if survey.state == 'review' or survey.state == 'deactivate' %}
                                     <form method="POST">
                                         <div class="form-group">
                                             <button type="submit" name="review" value='{{survey.course_name}} {{survey.course_session}}' class="btn btn-success">Review</button>
                                         </div>
                                     </form>
+                                    {% elif survey.state == 'closed' %}
+                                        <form method='POST'>
+                                            <div class="form-group">
+                                                <button type="submit" name="metrics" value='{{survey.course_name}} {{ survey.course_session}}' class="btn btn-success">Metrics</button>
+                                            </div>
+                                        </form>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% endif %}

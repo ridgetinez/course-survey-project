@@ -4,6 +4,7 @@ from flask import render_template, session, redirect, url_for, request
 @app.route('/', methods=['GET', 'POST'])
 def index():
     """ Returns/renders the admin dashboard page (if access authorised) or the landing page (if access not authorised) """
+
     if "user" in session:
         if session["user"]["role"] == "admin":
             return redirect(url_for("admin_dashboard", sub_page="surveys"))
@@ -39,6 +40,9 @@ def admin_dashboard(sub_page):
             if "close" in request.form:
                 survey_list = request.form['close'].split(" ")
                 modelcontrollers.SurveyController.close_survey(survey_list[0], survey_list[1])
+            if "metrics" in request.form:
+                session["survey_metrics"] = request.form["metrics"]
+                return redirect(url_for('metrics'))
         return render_template('admin_dashboard_surveys.html', surveys=modelcontrollers.SurveyController.get_all_surveys())
     if sub_page == 'questions':
         if request.method == 'POST':
@@ -130,7 +134,11 @@ def respond(id):
     if request.method == "POST":
         controller.FormController.parse_response(request.form, id)
         return redirect(url_for('student_dashboard', id=id))
-    survey_list = session.pop('survey_to_complete').split(" ")
+    try:
+        survey_list = session.pop('survey_to_complete').split(" ")
+    except KeyError:
+        return redirect(url_for('invalid_permission'))
+
     return render_template("view_survey.html", survey=modelcontrollers.SurveyController.get_survey(survey_list[0], survey_list[1]), questions=modelcontrollers.SurveyController.get_survey_questions(survey_list[0], survey_list[1]))
 
 @app.route('/studentdashboard/<id>', methods=['GET','POST'])
@@ -139,9 +147,13 @@ def student_dashboard(id):
         return redirect(url_for('invalid_permission'))
 
     if request.method == 'POST':
-        session['survey_to_complete'] = request.form['respond']
-        return redirect(url_for('respond', id=id))
-    print(modelcontrollers.UserController.check_guest_approved(id))
+        if "respond" in request.form:
+            session['survey_to_complete'] = request.form['respond']
+            return redirect(url_for('respond', id=id))
+        if "metrics" in request.form:
+            session["survey_metrics"] = request.form["metrics"]
+            return redirect(url_for('metrics'))
+          
     if modelcontrollers.UserController.check_guest_approved(id) == False: #catch unnaproved guests
         return render_template("student_dashboard.html")
 
@@ -153,8 +165,13 @@ def staff_dashboard(id):
         return redirect(url_for('invalid_permission'))
 
     if request.method == 'POST':
-        session['survey_to_review'] = request.form['review']
-        return redirect(url_for('review_survey', id=id))
+        if "review" in request.form:
+            session['survey_to_review'] = request.form['review']
+            return redirect(url_for('review_survey', id=id))
+        if "metrics" in request.form:
+            session["survey_metrics"] = request.form["metrics"]
+            return redirect(url_for('metrics'))
+
     return render_template("staff_dashboard.html", surveys=modelcontrollers.UserController.get_user_survey(id))
 
 @app.route('/staffdashboard/<id>/review', methods=['GET', 'POST'])
@@ -179,6 +196,7 @@ def review_survey(id):
     survey_as_list = survey.split(" ");
     return render_template("review_survey.html", survey=modelcontrollers.SurveyController.get_survey(survey_as_list[0], survey_as_list[1]), questions=modelcontrollers.SurveyController.get_survey_questions(survey_as_list[0], survey_as_list[1]))
 
+
 @app.route('/register', methods=['GET', 'POST'])
 def register_account():
     if request.method == 'POST':
@@ -193,6 +211,17 @@ def register_account():
         else:
             return redirect(url_for('index'))
     return render_template("guest_register.html", course_list=modelcontrollers.CourseController.get_courses())
+
+@app.route('/metrics')
+def metrics():
+    try:
+        survey = session.pop('survey_metrics')
+    except KeyError:
+        return redirect(url_for('invalid_permission'))
+    survey_as_list = survey.split(" ");
+
+    return render_template("view_metrics.html", responses=modelcontrollers.ResponsesController.get_responses(survey_as_list[0], survey_as_list[1]), get_question=modelcontrollers.QuestionController.get_question, course_name=survey_as_list[0], course_session=survey_as_list[1])
+
 
 @app.route('/invalid_permission')
 def invalid_permission():

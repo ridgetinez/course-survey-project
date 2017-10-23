@@ -32,16 +32,24 @@
                         <th>Start Time - End Time</th>
                         <th></th>
                         {% for survey in surveys %}
-                            {% if survey.state == 'active' or survey.state == 'adeactivate' %}
+                            {% if survey.state == 'active' or survey.state == 'adeactivate' or survey.state == 'closed' %}
                                 <tr>
                                     <td>{{ survey.course_name }} {{ survey.course_session }}</td>
                                     <td>{{ survey.starttime }} - {{ survey.endtime }}</td>
                                     <td>
+                                        {% if survey.state == 'active' or survey.state == 'adeactivate' %}
                                         <form method="POST">
                                             <div class="form-group">
                                                 <button type="submit" name="respond" value='{{survey.course_name}} {{survey.course_session}}' class="btn btn-success">Respond</button>
                                             </div>
                                         </form>
+                                        {% elif survey.state == 'closed' %}
+                                            <form method='POST'>
+                                                <div class="form-group">
+                                                    <button type="submit" name="metrics" value='{{survey.course_name}} {{ survey.course_session}}' class="btn btn-success">Metrics</button>
+                                                </div>
+                                            </form>
+                                        {% endif %}
                                     </td>
                                 </tr>
                             {% endif %}

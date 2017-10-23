@@ -1,5 +1,5 @@
 """
-__init__.py tells server that the directory is a python module
+__init__.py initialises the server and database (sqlite3)
 """
 
 from flask import Flask
@@ -13,7 +13,7 @@ engine = create_engine('sqlite:///library.db')
 from surveyapp import models
 
 try:
-    Base.metadata.create_all(engine)
+    Base.metadata.create_all(engine) # Creates database if not there already
 except:
     print('Table already there.')
 
@@ -21,7 +21,7 @@ DBSession = sessionmaker(bind=engine)
 
 from surveyapp import modelcontrollers
 
-modelcontrollers.CSVloader.get_users_csv()
+modelcontrollers.CSVloader.get_users_csv()  # loads .csv files
 modelcontrollers.CSVloader.get_course_csv()
 modelcontrollers.CSVloader.get_enrolement_csv()
 

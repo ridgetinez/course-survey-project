@@ -1,0 +1,36 @@
+{% extends 'base_page.html' %}
+
+<!-- Page Title -->
+{% block title %}{{ course_name }} {{course_session}}{% endblock %}
+
+<!-- Page Body -->
+{% block content %}
+<div class="container" style="padding-top:20px">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">Responses for {{ course_name }} {{ course_session }}</div>
+                <div class="card-body">
+                    <table class="table">
+                        <th>Question</th>
+                        <th>Answer</th>
+                    {% for response in responses %}
+                        <tr>
+                            {% set question = get_question(response.qid) %}
+                            <td>{{ question[1] }} </td>
+                            <td>
+                                {% if question[2] | length != 0 %}
+                                    {{ question[2][response.response | int] }}
+                                {% else %}
+                                    {{ response.response }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
