@@ -126,13 +126,13 @@ def admin_dashboard_add_s():
 
         if result[0] == False:
             if result[1] == 'qerror':
-                return render_template('admin_dashboard_create_survey.html', questions=modelcontrollers.QuestionController.get_all_questions(), course_list=modelcontrollers.CourseController.get_courses(), selection_error=True)
+                return render_template('admin_dashboard_create_survey.html', questions=modelcontrollers.QuestionController.get_all_questions('True'), course_list=modelcontrollers.CourseController.get_courses(), selection_error=True)
             if result[1] == 'terror':
-                return render_template('admin_dashboard_create_survey.html', questions=modelcontrollers.QuestionController.get_all_questions(), course_list=modelcontrollers.CourseController.get_courses(), time_error=True)
+                return render_template('admin_dashboard_create_survey.html', questions=modelcontrollers.QuestionController.get_all_questions('True'), course_list=modelcontrollers.CourseController.get_courses(), time_error=True)
             if result[1] == 'verror':
-                return render_template('admin_dashboard_create_survey.html', questions=modelcontrollers.QuestionController.get_all_questions(), course_list=modelcontrollers.CourseController.get_courses(), value_error=True)
+                return render_template('admin_dashboard_create_survey.html', questions=modelcontrollers.QuestionController.get_all_questions('True'), course_list=modelcontrollers.CourseController.get_courses(), value_error=True)
             if result[1] == 'rerror':
-                return render_template('admin_dashboard_create_survey.html', questions=modelcontrollers.QuestionController.get_all_questions(), course_list=modelcontrollers.CourseController.get_courses(), redo_error=True)
+                return render_template('admin_dashboard_create_survey.html', questions=modelcontrollers.QuestionController.get_all_questions('True'), course_list=modelcontrollers.CourseController.get_courses(), redo_error=True)
 
 
         return redirect(url_for('admin_dashboard', sub_page='surveys'))
