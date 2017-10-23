@@ -1,16 +1,25 @@
-""" Derek Daquel
-- Sample unit test set up from the iteration 3 specs
-- Need to test 5 core user stories. Ones I am currently testing are:
-    ADMIN - creation of course survey
-    USER - submitting the course survey
-    STAFF - review of survey
+"""
+tests.py ... contains unit testing for the survey
+
+Helpful instructions:
+
+- Need to test 5 core user stories
+    USER - submitting the course survey ----> dont do this yet
+    STAFF - review of survey ---------------> dont do this yet
+- NOTE: I MUST TEST THE FOLLOWING
+    1. create mandatory/optional questions
+    2. create a survey
+    3. enrol a student
 - General set up of unit test
     1. import unittest
     2. set up a class with (unittest.TestCase)
     3. have a setup() function
-    4. set up multiple tests starting with "test_...()"
+    4. set up multiple tests starting with "test_" and ending in "in/valid"
     5. have a teardown() function
     6. compile/execute using python3 -m unittest -v test.py
+- Docstrings include detail of what should happens
+        :pre : pre condition message
+        :post : post condition message
 """
 
 import unittest # Vital library used for unit tests
@@ -34,9 +43,53 @@ class Test_Creation_of_Survey(unittest.TestCase):
 
     def setup(self):
         """
-        Load appropriate .csv's for testing
+        Load appropriate .csv's for testing and start database session
         """
+        DBsession = sessionmaker(bind=engine)
+        session = DBsession()
 
+        cloader = CourseLoader()
+        cloader.csv_to_db("static/courses.csv")
+        eloader = EnrolmentLoader()
+        eloader.csv_to_db("static/enrolments.csv")
+        eloader.get_all()
+        uloader = UserLoader()
+        uloader.csv_to_db("static/passwords.csv")
+        uloader.get_all()
+
+    def test_number_questions_valid(self):
+
+    def test_number_questions_invalid(self):
+
+    def test_start_end_time_valid(self):
+
+    def test_start_end_time_invalid(self):
+
+        course_name = "[insert here]"
+        course_session = "[insert here]"
+        sur = modelcontrollers.SurveyController.get_survey(course_name, course_session)
+        sur = session.query(models.Survey).filter(models.Survey.course_name == survey.course_name).filter(models.Survey.course_session == survey.course_session).first()
+        start_time = datetime.now()
+        end_time = sur.endtime
+        self.assertGreater(start_time, end_time);
+
+    def test_creation_valid(self):
+
+    def test_creation_invalid(self):
+
+    def test_availability_in_staff_review(self):
+
+        survey = session.query(models.Survey).filter(models.Survey.course_name == survey.course_name).filter(models.Survey.course_session == survey.course_session).first()
+        modelcontrollers.SurveyController.set_review_after_start()
+        assertEqual(survey.state, 'review')
+
+    def teardown(self):
+        session.close()
+# ---------------------------------------------------------------------------------------------
+class Test_Enrol_Student(unittest.TestCase):
+
+    # TODO: convert this test case to be applicable to our survey system
+    def setUp(self):
         db.create_all()
         cloader = CourseLoader()
         cloader.csv_to_db("static/courses.csv")
@@ -47,43 +100,90 @@ class Test_Creation_of_Survey(unittest.TestCase):
         uloader.csv_to_db("static/passwords.csv")
         uloader.get_all()
 
-    def test_valid_number_questions(self):
+    def test_enrol_student_invalid_course(self):
         """
-            :pre : pre condition message
-            :post : post condition message
+        #:post : There will be no changes in the database
         """
+        zID = 12
+        course_offering = ""
 
-        self.assertGreater(n_chosen_questions, 1)
+        prev_students = num_enrolled_students(course_offering)
+        with self.assertRaises(InvalidInputException):
+            enrol_user(zID, course_offering)
+        curr_students = num_enrolled_students(course_offering)
 
-    def test_valid_start_end_time(self):
-    """
-        :pre : pre condition message
-        :post : post condition message
-    """
+        self.assertEqual(prev_students, curr_students)
+        self.assertEqual(get_user(zID), None)
 
-        start_time = models.Survey.time
-        end_time = models.Survey.endtime
-        self.assertGreater(start_time, end_time);
+    def test_enrol_invalid_user(self):
+        """
+        #:pre  : The student isn't already enrolled in the course
+        #:post : The database will have a relationship between
+        #        the course offering and the student
+        """
+        zID = "z511"
+        course_offering = "COMP1531 17s2"
 
-    def test_valid_creation(self):
-    """
-        :pre : pre condition message
-        :post : post condition message
-    """
+        prev_students = num_enrolled_students(course_offering)
+        with self.assertRaises(InvalidInputException):
+            enrol_user(zID, course_offering)
+        curr_students = num_enrolled_students(course_offering)
 
-    def test_availability_in_staff_review(self):
-    """
-        :pre : pre condition message
-        :post : post condition message
-    """
-        survey = session.query(models.Survey).filter(models.Survey.course_name == survey.course_name).filter(models.Survey.course_session == survey.course_session).first()
-        modelcontrollers.SurveyController.set_review_after_start()
-        assertEqual(survey.state, 'review')
+        self.assertEqual(prev_students, curr_students)
+        self.assertEqual(get_user(zID), None)
 
-    def teardown(self):
+    def test_enrol_non_existent_user(self):
+        """
+        #:pre  : The student isn't already enrolled in the course
+        #:post : The database will have a relationship between
+        #        the course offering and the student
+        """
+        zID = 12
+        course_offering = "COMP1531 17s2"
+
+        prev_students = num_enrolled_students(course_offering)
+        with self.assertRaises(UserNotFoundException):
+            enrol_user(zID, course_offering)
+        curr_students = num_enrolled_students(course_offering)
+
+        self.assertEqual(prev_students, curr_students)
+        self.assertEqual(get_user(zID), None)
+
+    def test_enrol_valid(self):
+        """
+        #:pre  : The student isn't already enrolled in the course
+        #:post : The database will have a relationship between the course offering and the student
+        """
+        zID = 571
+        course_offering = "COMP1531 17s2"
+        assert course_offering not in get_user(zID).courses
+        prev_students = num_enrolled_students(course_offering)
+        enrol_user(zID, course_offering)
+        curr_students = num_enrolled_students(course_offering)
+
+        self.assertEqual(prev_students + 1, curr_students)
+
+    def tearDown(self):
         db.session.remove()
         db.drop_all()
-# ------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------
+class Test_Create_Question(unittest.TestCase):
+
+    def setup(self):
+        DBsession = sessionmaker(bind=engine)
+        session = DBsession()
+
+    def test_chose_mandatory_question_valid(self):
+
+    def test_chose_mandatory_question_invalid(self):
+
+    def test_chose_optional_question_valid(self):
+
+    def test_chose_optional_question_invalid(self):
+
+    def teardown(self):
+        session.close()
+# ---------------------------------------------------------------------------------------------
 class Test_Submitting_Of_Course_Survey(unittest.TestCase):
     """
     ACCEPTANCE CRITERIA
@@ -103,18 +203,21 @@ class Test_Submitting_Of_Course_Survey(unittest.TestCase):
         uloader = UserLoader()
         uloader.csv_to_db("static/passwords.csv")
         uloader.get_all()
-    def test_valid_responses(self):
 
-    #def test_notification_and_reroute(self):
+    def test_response_valid(self):
+
+    def test_response_invalid(self):
 
     def test_availability_of_completed_survey(self):
 
-    def test_valid_write_to_db(self):
+    def test_write_to_db_valid(self):
+
+    def test_write_to_db_invalid(self):
 
     def teardown(self):
         db.session.remove()
         db.drop_all()
-# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------
 class Test_Staff_Review(unittest.TestCase):
     """
     ACCEPTANCE CRITERIA
@@ -133,18 +236,19 @@ class Test_Staff_Review(unittest.TestCase):
         uloader = UserLoader()
         uloader.csv_to_db("static/passwords.csv")
         uloader.get_all()
+
     def test_survey_state_change(self):
 
     def teardown(self):
         db.session.remove()
         db.drop_all()
-# -------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------
 if __name__=="__main__":
     """
     """
     Runs the tests
     unittest.main()
-# --------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 
 
 
