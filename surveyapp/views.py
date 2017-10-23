@@ -48,7 +48,7 @@ def admin_dashboard(sub_page):
         if request.method == 'POST':
             if "delete" in request.form:
                 modelcontrollers.QuestionController.delete_question(request.form["delete"])
-        return render_template('admin_dashboard_questions.html', questions=modelcontrollers.QuestionController.get_all_questions())
+        return render_template('admin_dashboard_questions.html', questions=modelcontrollers.QuestionController.get_all_questions('False'))
     if sub_page == 'guests':
         if request.method == 'POST':
             modelcontrollers.EnrolmentController.approve_enrolment(request.form["approve"])
@@ -124,7 +124,7 @@ def admin_dashboard_add_s():
 
         return redirect(url_for('admin_dashboard', sub_page='surveys'))
 
-    return render_template('admin_dashboard_create_survey.html', questions=modelcontrollers.QuestionController.get_all_questions(), course_list=modelcontrollers.CourseController.get_courses())
+    return render_template('admin_dashboard_create_survey.html', questions=modelcontrollers.QuestionController.get_all_questions('True'), course_list=modelcontrollers.CourseController.get_courses())
 
 @app.route('/survey/respond/<id>', methods=['POST', 'GET'])
 def respond(id):
@@ -153,7 +153,7 @@ def student_dashboard(id):
         if "metrics" in request.form:
             session["survey_metrics"] = request.form["metrics"]
             return redirect(url_for('metrics'))
-          
+
     if modelcontrollers.UserController.check_guest_approved(id) == False: #catch unnaproved guests
         return render_template("student_dashboard.html")
 
@@ -183,7 +183,7 @@ def review_survey(id):
         if 'accept' in request.form:
             survey_as_list = request.form['accept'].split(" ")
             modelcontrollers.SurveyController.set_survey_active(survey_as_list[0], survey_as_list[1])
-
+            controller.FormController.review_add_questions(request.form)
             return redirect(url_for('staff_dashboard', id=id))
 
         if 'cancel' in request.form:
@@ -194,7 +194,7 @@ def review_survey(id):
     except KeyError:
         return redirect(url_for('invalid_permission'))
     survey_as_list = survey.split(" ");
-    return render_template("review_survey.html", survey=modelcontrollers.SurveyController.get_survey(survey_as_list[0], survey_as_list[1]), questions=modelcontrollers.SurveyController.get_survey_questions(survey_as_list[0], survey_as_list[1]))
+    return render_template("review_survey.html", survey=modelcontrollers.SurveyController.get_survey(survey_as_list[0], survey_as_list[1]), questions=modelcontrollers.SurveyController.get_survey_questions(survey_as_list[0], survey_as_list[1]), optional_questions=modelcontrollers.QuestionController.get_optional_questions())
 
 
 @app.route('/register', methods=['GET', 'POST'])
