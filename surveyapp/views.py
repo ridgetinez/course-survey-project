@@ -19,7 +19,7 @@ def index():
 
         #attempt to authenticate user using information from login form
         auth_success = controller.FormController.parse_login(request.form)
-        if auth_success:
+        if auth_success == True:
             return redirect(url_for("index"))
         #if not authenticated, render landing page again with notification of invalid login credentials
         return render_template('landing_page.html', failedAuth=True)
@@ -124,7 +124,7 @@ def admin_dashboard_add_s():
 
 @app.route('/survey/respond/<id>', methods=['POST', 'GET'])
 def respond(id):
-    if auth.UserAuthoriser.check_permission("student", id) == False:
+    if (auth.UserAuthoriser.check_permission("student", id) or auth.UserAuthoriser.check_permission("guest", id)) == False:
         return redirect(url_for('invalid_permission'))
 
     if request.method == "POST":
@@ -141,7 +141,7 @@ def student_dashboard(id):
     if request.method == 'POST':
         session['survey_to_complete'] = request.form['respond']
         return redirect(url_for('respond', id=id))
-
+    print(modelcontrollers.UserController.check_guest_approved(id))
     if modelcontrollers.UserController.check_guest_approved(id) == False: #catch unnaproved guests
         return render_template("student_dashboard.html")
 

@@ -32,7 +32,8 @@ class FormController(object):
             user = modelcontrollers.UserController.get_user(request['id'])
             auth.UserAuthoriser.provideUserSession({'identifier' : user.uid, 'role' : user.role})
             return True
-        return [False, 'aerror']
+        return False
+    
     def parse_create_q(request):
         answers = []
         for i in range(session['n_answers']):

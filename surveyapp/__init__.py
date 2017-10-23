@@ -5,6 +5,7 @@ __init__.py tells server that the directory is a python module
 from flask import Flask
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
 engine = create_engine('sqlite:///library.db')
@@ -15,6 +16,8 @@ try:
     Base.metadata.create_all(engine)
 except:
     print('Table already there.')
+
+DBSession = sessionmaker(bind=engine)
 
 from surveyapp import modelcontrollers
 
