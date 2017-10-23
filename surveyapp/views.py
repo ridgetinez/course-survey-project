@@ -1,5 +1,16 @@
-from surveyapp import app, readers, modelcontrollers, auth, controller
-from flask import render_template, session, redirect, url_for, request
+from surveyapp import app, readers, modelcontrollers, auth, controller, metricscontroller
+from flask import render_template, session, redirect, url_for, request, send_file
+import io
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+# from matplotlib.dates import DateFormatter
+import numpy as np
+
+@app.after_request
+def add_header(response):
+    response.cache_control.max_age = 1
+    return response
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -39,7 +50,7 @@ def admin_dashboard(sub_page):
                 survey_list = request.form['close'].split(" ")
                 modelcontrollers.SurveyController.close_survey(survey_list[0], survey_list[1])
             if "metrics" in request.form:
-                session["survey_metrics"] = request.form["metrics"]
+                session["survey_metrics"] = request.form["metrics"]     # note session acts like a global array to pass values
                 return redirect(url_for('metrics'))
         return render_template('admin_dashboard_surveys.html', surveys=modelcontrollers.SurveyController.get_all_surveys())
     if sub_page == 'questions':
@@ -192,9 +203,10 @@ def metrics():
         survey = session.pop('survey_metrics')
     except KeyError:
         return redirect(url_for('invalid_permission'))
-    survey_as_list = survey.split(" ");
-
-    return render_template("view_metrics.html", responses=modelcontrollers.ResponsesController.get_responses(survey_as_list[0], survey_as_list[1]), get_question=modelcontrollers.QuestionController.get_question, course_name=survey_as_list[0], course_session=survey_as_list[1])
+    surveyID = survey.split(" ")
+    visualiser = metricscontroller.Visualiser(surveyID[0], surveyID[1])
+    print(visualiser.visualise_student_engagement())
+    return render_template("view_metrics.html", responses=modelcontrollers.ResponsesController.get_responses(surveyID[0], surveyID[1]), get_question=modelcontrollers.QuestionController.get_question, course_name=surveyID[0], course_session=surveyID[1])
 
 @app.route('/invalid_permission')
 def invalid_permission():
