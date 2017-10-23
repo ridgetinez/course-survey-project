@@ -205,7 +205,7 @@ class QuestionController():
         q = QuestionController.get_question(id)
         return q[1]
 
-
+    #initial problem
     def get_all_questions():
         session = DBSession()
         if mandatory_only == 'True':
