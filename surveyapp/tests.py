@@ -1,15 +1,10 @@
 """
 tests.py ... contains unit testing for the survey
+"""
 
+"""
 Helpful instructions:
-
 - Need to test 5 core user stories
-    USER - submitting the course survey ----> dont do this yet
-    STAFF - review of survey ---------------> dont do this yet
-- NOTE: I MUST TEST THE FOLLOWING
-    1. create mandatory/optional questions
-    2. create a survey
-    3. enrol a student
 - General set up of unit test
     1. import unittest
     2. set up a class with (unittest.TestCase)
@@ -18,16 +13,17 @@ Helpful instructions:
     5. have a teardown() function
     6. compile/execute using python3 -m unittest -v test.py
 - Docstrings include detail of what should happens
-        :pre : pre condition message
-        :post : post condition message
+    :pre : pre condition message
+    :post : post condition message
 """
 
-import unittest # Vital library used for unit tests
-from surveyapp import * # Import all associated functions/variables from surveyapp's files
+# IMPORT LIBRARYS ---------------------------------------------------------------------------
+import unittest
+from modelcontrollers import  CSVloader, CourseController, EnrolmentController, UserController, QuestionController, SurveyController, ResponsesController
 from writers import CourseLoader, EnrolmentLoader, UserLoader # Functions to use for testing
-# TODO: i may need more
+from datetime import datetime
 
-# --------------------------------------------------------------------------------------------
+# DEFINITION OF TEST CASES -----------------------------------------------------------------------------
 class Test_Creation_of_Survey(unittest.TestCase):
 
     """
@@ -42,40 +38,40 @@ class Test_Creation_of_Survey(unittest.TestCase):
     """
 
     def setup(self):
-        """
-        Load appropriate .csv's for testing and start database session
-        """
-        DBsession = sessionmaker(bind=engine)
-        session = DBsession()
-
-        cloader = CourseLoader()
-        cloader.csv_to_db("static/courses.csv")
-        eloader = EnrolmentLoader()
-        eloader.csv_to_db("static/enrolments.csv")
-        eloader.get_all()
-        uloader = UserLoader()
-        uloader.csv_to_db("static/passwords.csv")
-        uloader.get_all()
-
-    def test_number_questions_valid(self):
-
-    def test_number_questions_invalid(self):
+        self.surveys = SurveyController()
 
     def test_start_end_time_valid(self):
+        questions = ["A", ["Hello", "Hey"]]
+        self.surveys.write_survey("COMP1531", "17s2", datetime.now(), datetime.now() + datetime.timedelta(minutes=10), questions)
+        survey = self.surveys.get_survey("COMP1531", "17s2")
+        start_time = datetime.now()
+        end_time = survey.endtime
+        self.assertSmaller(start_time, end_time);
 
     def test_start_end_time_invalid(self):
-
-        course_name = "[insert here]"
-        course_session = "[insert here]"
-        sur = modelcontrollers.SurveyController.get_survey(course_name, course_session)
-        sur = session.query(models.Survey).filter(models.Survey.course_name == survey.course_name).filter(models.Survey.course_session == survey.course_session).first()
+        questions = ["A", ["Hello", "Hey"]]
+        self.surveys.write_survey("COMP1531", "17s2", datetime.now(), datetime.now() - datetime.timedelta(minutes=10), questions)
+        survey = self.surveys.get_survey("COMP1531", "17s2")
         start_time = datetime.now()
-        end_time = sur.endtime
+        end_time = survey.endtime
         self.assertGreater(start_time, end_time);
 
     def test_creation_valid(self):
+        questions = ["A", ["Hello", "Hey"]]
+        self.surveys.write_survey("COMP1531", "17s2", datetime.now(), datetime.now() + datetime.timedelta(minutes=1), questions)
+        survey = self.surveys.get_survey("COMP1531", "17s2")
+        self.assertEqual(survey.course_name, "COMP1531")
+        self.assertEqual(survey.course_session, "17s2")
+        self.assertEqual(survey.starttime, datetime.now())
+        self.assertEqual(survey.endtime,  datetime.now() + datetime.timedelta(minutes=1))
+        self.assertEqual(survey.state, 'review')
+        self.assertEqual(survey.questions, questions    ) #need to implement
 
-    def test_creation_invalid(self):
+    def test_creation_duplicates(self):
+        questions = ["A", ["Hello", "Hey"]]
+        self.surveys.write_survey("COMP1531", "17s2", datetime.now(), datetime.now() + datetime.timedelta(minutes=1), questions)
+        with self.assertRaises(exc.IntegrityError):
+            self.surveys.write_survey("COMP1531", "17s2", datetime.now(), datetime.now() + datetime.timedelta(minutes=1), questions)
 
     def test_availability_in_staff_review(self):
 
@@ -88,32 +84,19 @@ class Test_Creation_of_Survey(unittest.TestCase):
 # ---------------------------------------------------------------------------------------------
 class Test_Enrol_Student(unittest.TestCase):
 
-    # TODO: convert this test case to be applicable to our survey system
     def setUp(self):
-        db.create_all()
-        cloader = CourseLoader()
-        cloader.csv_to_db("static/courses.csv")
-        eloader = EnrolmentLoader()
-        eloader.csv_to_db("static/enrolments.csv")
-        eloader.get_all()
-        uloader = UserLoader()
-        uloader.csv_to_db("static/passwords.csv")
-        uloader.get_all()
+        enrols = EnrolmentController()
 
     def test_enrol_student_invalid_course(self):
         """
         #:post : There will be no changes in the database
         """
         zID = 12
-        course_offering = ""
-
-        prev_students = num_enrolled_students(course_offering)
-        with self.assertRaises(InvalidInputException):
-            enrol_user(zID, course_offering)
-        curr_students = num_enrolled_students(course_offering)
-
-        self.assertEqual(prev_students, curr_students)
-        self.assertEqual(get_user(zID), None)
+        course_name = ""
+        course_session = ""
+        enrol = self.enrols.get_enrolment(zID)
+        self.assertEqual(enrol.course_name, "")
+        self.assertEqual(enrol.course_session, "")
 
     def test_enrol_invalid_user(self):
         """
@@ -122,15 +105,11 @@ class Test_Enrol_Student(unittest.TestCase):
         #        the course offering and the student
         """
         zID = "z511"
-        course_offering = "COMP1531 17s2"
-
-        prev_students = num_enrolled_students(course_offering)
-        with self.assertRaises(InvalidInputException):
-            enrol_user(zID, course_offering)
-        curr_students = num_enrolled_students(course_offering)
-
-        self.assertEqual(prev_students, curr_students)
-        self.assertEqual(get_user(zID), None)
+        course_name = "COMP1531"
+        course_session = "17s2"
+        enrol = self.enrols.get_enrolment(zID)
+        self.assertEqual(enrol.course_name, course_name)
+        self.assertEqual(enrol.course_session, course_session)
 
     def test_enrol_non_existent_user(self):
         """
@@ -139,15 +118,12 @@ class Test_Enrol_Student(unittest.TestCase):
         #        the course offering and the student
         """
         zID = 12
-        course_offering = "COMP1531 17s2"
-
-        prev_students = num_enrolled_students(course_offering)
-        with self.assertRaises(UserNotFoundException):
-            enrol_user(zID, course_offering)
-        curr_students = num_enrolled_students(course_offering)
-
-        self.assertEqual(prev_students, curr_students)
-        self.assertEqual(get_user(zID), None)
+        course_name = "COMP1531"
+        course_session = "17s2"
+        self.enrols.write_enrolment(course_name, course_session, zID)
+        enrol = self.enrols.get_enrolment(zID)
+        self.assertEqual(enrol.course_name, "COMP1531")
+        self.assertEqual(enrol.course_session, "17s2")
 
     def test_enrol_valid(self):
         """
@@ -157,9 +133,9 @@ class Test_Enrol_Student(unittest.TestCase):
         zID = 571
         course_offering = "COMP1531 17s2"
         assert course_offering not in get_user(zID).courses
-        prev_students = num_enrolled_students(course_offering)
+       # prev_students = num_enrolled_students(course_offering)
         enrol_user(zID, course_offering)
-        curr_students = num_enrolled_students(course_offering)
+      #  curr_students = num_enrolled_students(course_offering)
 
         self.assertEqual(prev_students + 1, curr_students)
 
@@ -170,16 +146,43 @@ class Test_Enrol_Student(unittest.TestCase):
 class Test_Create_Question(unittest.TestCase):
 
     def setup(self):
-        DBsession = sessionmaker(bind=engine)
-        session = DBsession()
+        self.questions = QuestionController()
 
-    def test_chose_mandatory_question_valid(self):
+    def test_create_mandatory_question_valid(self):
+        q = ["Is this a mandatory question?", ["Yes", "No"], "False" ]
+        self.questions.write_question(q)
+        q_list = question.get_all_questions("True")
 
-    def test_chose_mandatory_question_invalid(self):
+        self.assertEqual(q_list.question, "Is this a mandatory question?")
+        self.assertEqual(q_list.ans, ["Yes", "No"])
+        self.assertEqual(q_list.is_optional, "False")
 
-    def test_chose_optional_question_valid(self):
+    def test_create_mandatory_question_invalid(self):
+        q = ["", [], "False" ]
+        self.questions.write_question(q)
+        q_list = questions.get_all_questions("True")
 
-    def test_chose_optional_question_invalid(self):
+        self.assertEqual(q_list.question, "")
+        self.assertEqual(q_list.ans, "")
+        self.assertEqual(q_list.is_optional, "False")
+
+    def test_create_optional_question_valid(self):
+        q = ["Is this a optional question?", ["Yes", "No"], "True" ]
+        self.questions.write_question(q)
+        q_list = question.get_optional_questions()
+
+        self.assertEqual(q_list.question, "Is this a mandatory question?")
+        self.assertEqual(q_list.ans, ["Yes", "No"])
+        self.assertEqual(q_list.is_optional, "True")
+
+    def test_create_optional_question_invalid(self):
+        q = ["", [], "True" ]
+        self.questions.write_question(q)
+        q_list = questions.get_optional_questions("True")
+
+        self.assertEqual(q_list.question, "")
+        self.assertEqual(q_list.ans, "")
+        self.assertEqual(q_list.is_optional, "True")
 
     def teardown(self):
         session.close()
@@ -205,15 +208,15 @@ class Test_Submitting_Of_Course_Survey(unittest.TestCase):
         uloader.get_all()
 
     def test_response_valid(self):
-
+        pass
     def test_response_invalid(self):
-
+        pass
     def test_availability_of_completed_survey(self):
-
+        pass
     def test_write_to_db_valid(self):
-
+        pass
     def test_write_to_db_invalid(self):
-
+        pass
     def teardown(self):
         db.session.remove()
         db.drop_all()
@@ -238,26 +241,36 @@ class Test_Staff_Review(unittest.TestCase):
         uloader.get_all()
 
     def test_survey_state_change(self):
-
+        pass
     def teardown(self):
         db.session.remove()
         db.drop_all()
+
+
+
+engine = create_engine('sqlite:///tests.db')
+from surveyapp import models
+
+try:
+    Base.metadata.create_all(engine) # Creates database if not there already
+except:
+    print('Table already there.')
+
 # --------------------------------------------------------------------------------------------
 if __name__=="__main__":
-    """
-    """
-    Runs the tests
+    #   Runs the tests
     unittest.main()
 # ---------------------------------------------------------------------------------------------
 
+from surveyapp import modelcontrollers
 
+modelcontrollers.CSVloader.get_users_csv()  # loads .csv files
+modelcontrollers.CSVloader.get_course_csv()
+modelcontrollers.CSVloader.get_enrolement_csv()
 
-
-"""
------------------------------------------------------------
- THE CODE BELOW WAS USED AS REFERENCE
--------------------------------------------------------------
-"""
+"""---------------------------------------------------------------------------------------------
+CODE BELOW USED AS REFERENCE
+-----------------------------------------------------------------------------------------------"""
 
 """
 import unittest
