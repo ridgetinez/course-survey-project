@@ -5,6 +5,7 @@ __init__.py initialises the server and database (sqlite3)
 from flask import Flask
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
 engine = create_engine('sqlite:///library.db')
@@ -15,6 +16,8 @@ try:
     Base.metadata.create_all(engine) # Creates database if not there already
 except:
     print('Table already there.')
+
+DBSession = sessionmaker(bind=engine)
 
 from surveyapp import modelcontrollers
 

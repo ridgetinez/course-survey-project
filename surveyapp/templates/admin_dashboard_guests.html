@@ -1,0 +1,65 @@
+{% extends 'base_page.html' %}
+
+<!-- Page Title -->
+{% block title %}Admin Dashboard{% endblock %}
+
+<!-- Navbar -->
+{% block nav %}
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href=""> Surveys </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="questions"> Questions </a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href=""> Guests <span class="sr-only">(current)</span></a>
+      </li>
+    </ul>
+</div>
+<ul class="navbar-nav mr-auto float-right">
+    <li class="nav-item">
+      <a class="nav-link" href="/logout"> Logout</a>
+    </li>
+</ul>
+{% endblock%}
+
+<!-- Page Content -->
+{% block content %}
+<div class="container" style="padding-top:20px">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">Active Surveys</div>
+                <div class="card-body">
+                    <div style="text-align:right"><a href="add/survey">Add Survey...</a></div>
+                    <table class="table">
+                        <th>Username</th>
+                        <th>Course</th>
+                        <th></th>
+                        {% for guest in guests %}
+                            <tr>
+                                <td>{{ guest.uid }}</td>
+                                <td>
+                                    {% for course in get_courses(guest.uid) %}
+                                        {{ course.course_name }} {{ course.course_session}}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <form method='POST'>
+                                        <div class='form-group'>
+                                            <button class='btn btn-success' type='submit' name='approve' value='{{ guest.uid }}'>Approve Guest</button>
+                                        </div>
+                                    </form>
+                                </td>
+                            </tr>
+                        {%endfor%}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
